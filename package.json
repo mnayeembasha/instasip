@@ -1,0 +1,12 @@
+{
+  "name": "instasip",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "cd server && bun install && bun run build && cd ../client && bun install && bun run build",
+    "start": "cd server && bun run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

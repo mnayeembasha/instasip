@@ -1,0 +1,84 @@
+import mongoose from 'mongoose';
+
+export interface OrderItemDocument {
+    product: mongoose.Schema.Types.ObjectId;
+    quantity: number;
+    price: number;
+}
+
+export interface OrderDocument extends mongoose.Document {
+    user: mongoose.Schema.Types.ObjectId;
+    items: OrderItemDocument[];
+    totalAmount: number;
+    status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+    shippingAddress: {
+        street: string;
+        city: string;
+        state: string;
+        zipCode: string;
+        country: string;
+    };
+    paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+    orderDate: Date;
+    deliveredAt?: Date;
+}
+
+const orderItemSchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+    price: {
+        type: Number,
+        required: true,
+        min: 0
+    }
+});
+
+const orderSchema = new mongoose.Schema<OrderDocument>({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    items: [orderItemSchema],
+    totalAmount: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'],
+        default: 'pending'
+    },
+    shippingAddress: {
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        zipCode: { type: String, required: true },
+        country: { type: String, required: true, default: 'India' }
+    },
+    paymentStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'failed', 'refunded'],
+        default: 'pending'
+    },
+    orderDate: {
+        type: Date,
+        default: Date.now
+    },
+    deliveredAt: {
+        type: Date
+    }
+}, {
+    timestamps: true
+});
+
+export const Order = mongoose.model<OrderDocument>("Order", orderSchema);
