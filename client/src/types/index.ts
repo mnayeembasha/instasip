@@ -26,6 +26,7 @@ export interface CartItemType {
 }
 
 export interface OrderItemType {
+  _id: string;
   product: ProductType | string;  // Populated or ID
   quantity: number;
   price: number;

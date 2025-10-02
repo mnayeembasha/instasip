@@ -87,6 +87,7 @@ export const getMyOrders = async (req: Request, res: Response) => {
 
         const [orders, totalOrders] = await Promise.all([
             Order.find({ user: userId })
+                .populate('user','-password')
                 .populate('items.product')
                 .sort({ createdAt: -1 })
                 .skip(skip)

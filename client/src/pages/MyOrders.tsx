@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchMyOrders } from '@/store/features/orderSlice';
-// import {  cancelOrder } from '@/store/features/orderSlice';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-// import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
+import OrderDetailsModal from '@/components/OrderDetailsModal';
+import type { OrderType } from '@/types';
 
 const MyOrders = () => {
   const { orders, isFetchingOrders, error } = useAppSelector((state) => state.order);
@@ -14,16 +16,18 @@ const MyOrders = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
   useEffect(() => {
     if (!user) navigate('/login?redirect=/orders');
     else dispatch(fetchMyOrders());
   }, [user, dispatch, navigate]);
 
-  // const handleCancel = (id: string) => {
-  //   if (window.confirm('Are you sure you want to cancel this order?')) {
-  //     dispatch(cancelOrder(id));
-  //   }
-  // };
+  const handleViewDetails = (order: OrderType) => {
+    setSelectedOrder(order);
+    setModalOpen(true);
+  };
 
   if (!user) return <LoadingSpinner />;
 
@@ -43,7 +47,7 @@ const MyOrders = () => {
               <TableHead>ID</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Status</TableHead>
-              {/* <TablezHead>Actions</TablezHead> */}
+              <TableHead>Info</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -52,18 +56,41 @@ const MyOrders = () => {
                 <TableCell>{order._id}</TableCell>
                 <TableCell>&#8377;{order.totalAmount.toFixed(2)}</TableCell>
                 <TableCell className="capitalize">{order.status}</TableCell>
-                {/* <TableCell>
-                  {(order.status === 'pending' || order.status === 'confirmed') && (
-                    <Button variant="destructive" size="sm" onClick={() => handleCancel(order._id)}>Cancel</Button>
-                  )}
-                </TableCell> */}
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleViewDetails(order)}
+                    className="hover:bg-blue-50"
+                  >
+                    <IconInfoCircle className="w-5 h-5 text-blue-600" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
+
+      <OrderDetailsModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        order={selectedOrder}
+      />
     </div>
   );
 };
 
 export default MyOrders;
+
+// const handleCancel = (id: string) => {
+  //   if (window.confirm('Are you sure you want to cancel this order?')) {
+  //     dispatch(cancelOrder(id));
+  //   }
+  // };
+
+  {/* <TableCell>
+                  {(order.status === 'pending' || order.status === 'confirmed') && (
+                    <Button variant="destructive" size="sm" onClick={() => handleCancel(order._id)}>Cancel</Button>
+                  )}
+    </TableCell> */}

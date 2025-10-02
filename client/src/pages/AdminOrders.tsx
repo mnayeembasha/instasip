@@ -5,12 +5,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { IconPackage, IconTruck, IconCircleCheck, IconX, IconClock } from '@tabler/icons-react';
+import { IconPackage, IconTruck, IconCircleCheck, IconX, IconClock, IconInfoCircle } from '@tabler/icons-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
+import OrderDetailsModal from '@/components/OrderDetailsModal';
 import { useNavigate } from 'react-router-dom';
-import type { UserType } from '@/types';
+import type { UserType, OrderType } from '@/types';
 
 interface StatusUpdate {
   open: boolean;
@@ -32,6 +34,8 @@ const AdminOrders = () => {
     newStatus: null,
     currentStatus: null
   });
+  const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user?.isAdmin) navigate('/');
@@ -58,6 +62,11 @@ const AdminOrders = () => {
       });
       setStatusDialog({ open: false, orderId: null, newStatus: null, currentStatus: null });
     }
+  };
+
+  const handleViewDetails = (order: OrderType) => {
+    setSelectedOrder(order);
+    setDetailsModalOpen(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -159,6 +168,7 @@ const AdminOrders = () => {
                     <TableHead className="font-bold text-gray-700">Total Amount</TableHead>
                     <TableHead className="font-bold text-gray-700">Status</TableHead>
                     <TableHead className="font-bold text-gray-700">Update Status</TableHead>
+                    <TableHead className="font-bold text-gray-700">Info</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -211,6 +221,16 @@ const AdminOrders = () => {
                           </SelectContent>
                         </Select>
                       </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewDetails(order)}
+                          className="hover:bg-blue-50"
+                        >
+                          <IconInfoCircle className="w-5 h-5 text-blue-600" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -234,9 +254,6 @@ const AdminOrders = () => {
                 Are you sure you want to update the order status from{' '}
                 <span className="font-semibold capitalize">{statusDialog.currentStatus}</span> to{' '}
                 <span className="font-semibold capitalize">{statusDialog.newStatus}</span>?
-                <br />
-                <br />
-                {/* The customer will be notified of this status change. */}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-2 sm:gap-2">
@@ -250,6 +267,13 @@ const AdminOrders = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Order Details Modal */}
+        <OrderDetailsModal
+          open={detailsModalOpen}
+          onOpenChange={setDetailsModalOpen}
+          order={selectedOrder}
+        />
       </div>
     </div>
   );

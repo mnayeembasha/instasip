@@ -63,13 +63,6 @@ const Navbar = () => {
             >
               <IconBox size={18} className="mr-1" /> Products
             </Link>
-            {/* <Link
-                  to="/products"
-                  onClick={handleLinkClick}
-                  className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center"
-                >
-                  <IconPackage size={18} className="mr-1" /> Explore
-                </Link> */}
 
             {user ? (
               <>
