@@ -9,6 +9,7 @@ export interface UserType {
 export interface ProductType {
   _id: string;
   name: string;
+  slug:string;
   price: number;
   description: string;
   image: string;

@@ -7,8 +7,10 @@ import { axiosInstance } from '@/lib/axios';
 interface ProductState {
   products: ProductType[];
   adminProducts: ProductType[];
+  currentProduct: ProductType | null;
   isFetchingProducts: boolean;
   isFetchingAdminProducts: boolean;
+  isFetchingProduct: boolean;
   isAddingProduct: boolean;
   isEditingProduct: boolean;
   isDeletingProduct: boolean;
@@ -23,8 +25,10 @@ interface ApiError {
 const initialState: ProductState = {
   products: [],
   adminProducts: [],
+  currentProduct: null,
   isFetchingProducts: false,
   isFetchingAdminProducts: false,
+  isFetchingProduct: false,
   isAddingProduct: false,
   isEditingProduct: false,
   isDeletingProduct: false,
@@ -46,6 +50,22 @@ export const fetchProducts = createAsyncThunk<ProductType[], FetchProductsParams
       return res.data.products || [];
     } catch (error) {
       let errorMessage = 'Failed to fetch products';
+      if (error instanceof AxiosError) {
+        errorMessage = error.response?.data?.message || errorMessage;
+      }
+      return rejectWithValue({ message: errorMessage });
+    }
+  }
+);
+
+export const fetchProductBySlug = createAsyncThunk<ProductType, string, { rejectValue: ApiError }>(
+  'product/fetchProductBySlug',
+  async (slug, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get(`/products/slug/${slug}`);
+      return res.data.product;
+    } catch (error) {
+      let errorMessage = 'Failed to fetch product';
       if (error instanceof AxiosError) {
         errorMessage = error.response?.data?.message || errorMessage;
       }
@@ -116,7 +136,7 @@ export const editProduct = createAsyncThunk<ProductType, { id: string; data: Edi
   'product/editProduct',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.put(`/products/${id}`, data);
+      const res = await axiosInstance.put(`/products/id/${id}`, data);
       toast.success(res.data.message);
       return res.data.product;
     } catch (error) {
@@ -171,6 +191,7 @@ const productSlice = createSlice({
   initialState,
   reducers: {
     clearError: (state) => { state.error = null; },
+    clearCurrentProduct: (state) => { state.currentProduct = null; },
   },
   extraReducers: (builder) => {
     builder
@@ -181,6 +202,15 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isFetchingProducts = false;
+        state.error = action.payload?.message || 'Error';
+      })
+      .addCase(fetchProductBySlug.pending, (state) => { state.isFetchingProduct = true; state.error = null; })
+      .addCase(fetchProductBySlug.fulfilled, (state, action) => {
+        state.isFetchingProduct = false;
+        state.currentProduct = action.payload;
+      })
+      .addCase(fetchProductBySlug.rejected, (state, action) => {
+        state.isFetchingProduct = false;
         state.error = action.payload?.message || 'Error';
       })
       .addCase(fetchAdminProducts.pending, (state) => { state.isFetchingAdminProducts = true; state.error = null; })
@@ -234,5 +264,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearError } = productSlice.actions;
+export const { clearError, clearCurrentProduct } = productSlice.actions;
 export default productSlice.reducer;

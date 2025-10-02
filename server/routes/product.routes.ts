@@ -9,14 +9,16 @@ import {
     updateProduct,
     deleteProduct,
     getAllProductsForAdmin,
-    changeProductStatus
+    changeProductStatus,
+    getProductBySlug
 } from "../controllers/product.controller";
 
 const router = express.Router();
 
 // Public routes
 router.get("/", getProducts);
-router.get("/:id", getProductById);
+router.get("/id/:id", getProductById);
+router.get("/slug/:slug", getProductBySlug);
 
 // Admin routes
 router.get("/admin/all", adminMiddleware, getAllProductsForAdmin);

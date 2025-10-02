@@ -10,7 +10,7 @@ const AboutProduct: React.FC = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
             About Our Product
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl md:mx-auto text-left md:text-center">
             Insta-Sip revolutionizes your tea experience with our ready-to-brew tea cups. Fresh, organic leaves meet smart infusion technology for a hassle-free, delightful cup every time.
           </p>
         </div>

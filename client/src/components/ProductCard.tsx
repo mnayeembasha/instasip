@@ -7,6 +7,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { type ProductType } from '@/types';
 import toast from 'react-hot-toast';
 import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   product: ProductType;
@@ -29,11 +30,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <Card className="p-0 w-full h-full rounded-3xl border border-gray-200 bg-white shadow-sm transition-transform duration-200 hover:scale-[1.02] hover:shadow-md flex flex-col gap-0">
       {/* Product Image */}
       <CardHeader className="relative p-4 pb-1">
-        <img
-          src={product.image || '/placeholder.svg'}
-          alt={product.name}
-          className="object-cover w-full h-48 rounded-2xl transition-transform duration-200 hover:scale-105"
-        />
+        <Link to={`/products/${product.slug}`}>
+          <img
+            src={product.image}
+            alt={product.name}
+            className="object-cover w-full h-48 rounded-2xl transition-transform duration-200 hover:scale-105"
+          />
+        </Link>
         {product.stock === 0 && (
           <Badge className="absolute top-2 left-2 bg-red-500 text-white">Out of Stock</Badge>
         )}
@@ -41,11 +44,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       {/* Product Content */}
       <CardContent className="flex-1 space-y-2 px-4 pb-1">
-        <CardTitle className="truncate text-lg font-semibold">{product.name}</CardTitle>
+        <Link to={`/products/${product.slug}`}>
+          <CardTitle className="truncate text-lg font-semibold hover:underline">
+            {product.name}
+          </CardTitle>
+        </Link>
         <p className="text-xs text-gray-400 uppercase">{product.category}</p>
         <p className="text-xl font-bold text-primary">&#8377; {product.price.toFixed(2)}</p>
-        <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
-        <p className="text-xs text-gray-500">Stock: {product.stock}</p>
+        {/* <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p> */}
+        {/* <p className="text-xs text-gray-500">Stock: {product.stock}</p> */}
       </CardContent>
 
       {/* Footer Controls */}

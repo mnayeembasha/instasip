@@ -5,10 +5,10 @@ const UnleashCreativity: React.FC = () => {
     <section className="py-20 bg-gradient-to-b from-white to-[#FAF5F0]">
       <div className="container mx-auto px-4">
         {/* Heading */}
-        <h2 className="text-4xl font-bold text-center mb-6 text-accent">
-          Unleash Your Creativity With Insta-Sip
+        <h2 className="text-4xl font-bold  text-center mb-6 text-accent">
+          Unleash Your Creativity With InstaSip
         </h2>
-        <p className="text-center text-lg mb-16 max-w-2xl mx-auto text-gray-600">
+        <p className="md:text-center text-lg mb-16 max-w-2xl mx-auto text-gray-600">
           Experiment with different flavors and create your own unique recipes.
           Our innovative cups give you the freedom to enjoy delicious hot or cold drinks anytime.
         </p>

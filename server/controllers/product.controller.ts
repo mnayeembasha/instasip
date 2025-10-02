@@ -65,6 +65,26 @@ export const getProductById = async (req: Request, res: Response) => {
     }
 };
 
+export const getProductBySlug = async (req: Request, res: Response) => {
+  const { slug } = req.params;
+
+  try {
+    const product = await Product.findOne({ slug, isActive: true });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      message: "Product fetched successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("Error in getProductBySlug controller", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
 export const createProduct = async (req: Request, res: Response) => {
     try {
         const { name, price, description, image, stock, category } = req.body;
@@ -91,6 +111,7 @@ export const createProduct = async (req: Request, res: Response) => {
             price,
             description,
             image: imageUrl,
+            imagePublicId,
             stock,
             category
         });

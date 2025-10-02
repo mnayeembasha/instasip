@@ -5,7 +5,7 @@ const WhyChooseUs: React.FC = () => {
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 max-w-5xl text-center">
         <h2 className="text-4xl font-bold mb-12 text-primary">Why Choose InstaSip?</h2>
-        <p className="text-lg mb-16 text-gray-700">
+        <p className="text-lg mb-16 text-gray-700 text-left md:text-center">
           We chose Insta-Sip because it solves a real problem in today’s fast-paced lifestyle—people love tea but don’t always have the time or setup to brew it properly.
           With our ready-to-use, eco-friendly tea cups, we bring together convenience, health, and taste in one product.
         </p>

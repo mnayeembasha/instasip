@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 const images = [
+  'hero4.jpg',
   'hero1.jpg',
   'hero2.jpg',
   'hero3.jpg',
-  'hero4.jpg'
 ];
 
 const Hero: React.FC = () => {

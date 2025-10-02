@@ -57,7 +57,7 @@ const Cart = () => {
   if (!user) return <LoadingSpinner />;
 
   return (
-    <div className="max-w-7xl mx-auto p-4 pt-20 min-h-screen">
+    <div className="max-w-7xl mx-auto p-4 pt-30 min-h-screen bg-background">
       <h1 className="text-3xl font-bold mb-6 text-center">Your Cart</h1>
       {items.length === 0 ? (
         <p className="text-center text-gray-600">Your cart is empty. Start shopping!</p>
@@ -85,7 +85,7 @@ const Cart = () => {
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-bold text-lg">Total: ${total.toFixed(2)}</p>
+                  <p className="font-bold text-lg">Total: &#8377;{total.toFixed(2)}</p>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
                   <Form {...form}>

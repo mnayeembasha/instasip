@@ -11,6 +11,8 @@ import Cart from '@/pages/Cart';
 import AdminOrders from '@/pages/AdminOrders';
 import MyOrders from '@/pages/MyOrders';
 import AdminProducts from './pages/AdminProducts';
+import ProductDetails from './pages/ProductDetails';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -18,15 +20,46 @@ const App = () => {
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/orders" element={<MyOrders />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/orders" element={<AdminOrders />} />
-        </Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/signup" element={<Signup />} />
+  <Route path="/login" element={<Login />} />
+  <Route path="/products" element={<Products />} />
+  <Route path="/products/:slug" element={<ProductDetails />} />
+
+    {/* Protected routes */}
+    <Route
+      path="/cart"
+      element={
+        <ProtectedRoute>
+          <Cart />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/orders"
+      element={
+        <ProtectedRoute>
+          <MyOrders />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/products"
+      element={
+        <ProtectedRoute adminOnly>
+          <AdminProducts />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/orders"
+      element={
+        <ProtectedRoute adminOnly>
+          <AdminOrders />
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
         <Toaster position="top-right" />
       </Router>
     </Provider>

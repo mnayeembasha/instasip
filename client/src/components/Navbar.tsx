@@ -1,9 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { IconMenu2, IconShoppingCart, IconPackage, IconClipboardList, IconLogout } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import {
+  IconMenu2,
+  IconShoppingCart,
+  IconPackage,
+  IconClipboardList,
+  IconLogout,
+  IconBox,
+  IconUser,
+  IconUserPlus
+} from '@tabler/icons-react';
+import { useState } from 'react';
 import { logout } from '@/store/features/authSlice';
 
 const Navbar = () => {
@@ -11,19 +20,25 @@ const Navbar = () => {
   const { items } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleLogout = () => {
-    dispatch(logout()).then(() => navigate('/'));
+    dispatch(logout()).then(() => {
+      navigate('/');
+      setIsSheetOpen(false);
+    });
   };
 
+  const handleLinkClick = () => setIsSheetOpen(false);
+
   return (
-    <nav className="bg-white shadow-md fixed w-full z-10">
+    <nav className="bg-white shadow-md fixed w-full z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-2">
-            {/* Logo */}
+          {/* Logo and Brand */}
+          <div className="flex items-center space-x-2">
             <div className="w-9 h-9">
               <img
                 src="/logo.jpg"
@@ -31,83 +46,183 @@ const Navbar = () => {
                 className="w-full h-full object-cover rounded-full"
               />
             </div>
-
-            {/* Brand Name */}
             <Link
               to="/"
-              className="font-archivo flex-shrink-0 text-primary font-bold hover:opacity-80 transition text-2xl tracking-tighter "
+              className="font-archivo flex-shrink-0 text-primary font-bold hover:opacity-80 transition text-2xl tracking-tighter"
             >
               InstaSip
             </Link>
           </div>
 
+          {/* Desktop Menu */}
           <div className="hidden sm:flex sm:space-x-8 items-center">
-            <Link to="/products" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium">
-              Products
+            <Link
+              to="/products"
+              onClick={handleLinkClick}
+              className={`text-gray-900 hover:text-primary px-3 py-2 rounded-4xl text-md font-medium flex items-center ${user?.isAdmin ? '' : 'bg-[#F9EEDC]'}`}
+            >
+              <IconBox size={18} className="mr-1" /> Products
             </Link>
+            {/* <Link
+                  to="/products"
+                  onClick={handleLinkClick}
+                  className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center"
+                >
+                  <IconPackage size={18} className="mr-1" /> Explore
+                </Link> */}
+
             {user ? (
               <>
                 {user.isAdmin ? (
                   <>
-                    <Link to="/admin/products" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center">
+                    <Link
+                      to="/admin/products"
+                      onClick={handleLinkClick}
+                      className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center"
+                    >
                       <IconPackage className="mr-1" size={18} /> Manage Products
                     </Link>
-                    <Link to="/admin/orders" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center">
+                    <Link
+                      to="/admin/orders"
+                      onClick={handleLinkClick}
+                      className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center"
+                    >
                       <IconClipboardList className="mr-1" size={18} /> Manage Orders
                     </Link>
                   </>
                 ) : (
-                  <Link to="/orders" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium">
+                  <Link
+                    to="/orders"
+                    onClick={handleLinkClick}
+                    className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium"
+                  >
                     My Orders
                   </Link>
                 )}
-                <Link to="/cart" className="relative text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center">
-                  <IconShoppingCart size={18} />
-                  {cartCount > 0 && <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">{cartCount}</span>}
-                </Link>
-                <Button variant="ghost" onClick={handleLogout} className="flex items-center">
+                <Button variant="ghost" onClick={handleLogout} className="flex items-center text-gray-900 hover:bg-primary hover:text-primary-soft px-3 py-2 rounded-4xl text-md font-medium transition-all duration-300">
                   <IconLogout size={18} className="mr-1" /> Logout
                 </Button>
               </>
             ) : (
               <>
-                <Link to="/login" className="bg-primary text-primary-soft hover:opacity-80 px-4 md:px-8 py-2 rounded-3xl text-md font-medium">
-                  Login
+                <Link
+                  to="/login"
+                  onClick={handleLinkClick}
+                  className="bg-primary text-primary-soft hover:opacity-80 px-4  py-2 rounded-4xl text-md font-medium flex items-center"
+                >
+                  <IconUser size={18} className="mr-1" /> Login
                 </Link>
-                {/* <Link to="/signup" className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium">
-                  Signup
-                </Link> */}
+
               </>
             )}
+
+            <Link
+              to="/cart"
+              onClick={handleLinkClick}
+              className="relative text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center"
+            >
+              <IconShoppingCart size={18} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
           </div>
-          <div className="flex items-center sm:hidden">
-            <Sheet>
+
+          {/* Mobile Menu */}
+          <div className="flex items-center sm:hidden space-x-3">
+            {/* Cart icon outside the menu */}
+            <Link
+              to="/cart"
+              onClick={handleLinkClick}
+              className="relative text-gray-900 hover:text-primary flex items-center"
+            >
+              <IconShoppingCart size={22} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Mobile sheet menu */}
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost"><IconMenu2 /></Button>
+                <Button variant="ghost" className="text-primary">
+                  <IconMenu2 size={22} className='text-2xl'/>
+                </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="animate-fade-in">
-                <div className="flex flex-col space-y-4 mt-4">
-                  <Link to="/products" className="text-gray-900 hover:text-primary">Products</Link>
-                  {user ? (
-                    <>
-                      {user.isAdmin ? (
-                        <>
-                          <Link to="/admin/products" className="flex items-center"><IconPackage className="mr-1" size={18} /> Manage Products</Link>
-                          <Link to="/admin/orders" className="flex items-center"><IconClipboardList className="mr-1" size={18} /> Manage Orders</Link>
-                        </>
-                      ) : (
-                        <Link to="/orders">My Orders</Link>
-                      )}
-                      <Link to="/cart" className="flex items-center"><IconShoppingCart size={18} /> Cart {cartCount > 0 && `(${cartCount})`}</Link>
-                      <Button variant="ghost" onClick={handleLogout} className="flex items-center"><IconLogout size={18} className="mr-1" /> Logout</Button>
-                    </>
-                  ) : (
-                    <>
-                      <Link to="/login">Login</Link>
-                      <Link to="/signup">Signup</Link>
-                    </>
-                  )}
-                </div>
+              <SheetContent
+                side="right"
+                className="bg-white p-6 space-y-4 text-gray-900"
+              >
+                <Link
+                  to="/products"
+                  onClick={handleLinkClick}
+                  className="flex items-center hover:text-primary"
+                >
+                  <IconBox className="mr-2" size={18} /> Products
+                </Link>
+                {/* <Link
+                  to="/products"
+                  onClick={handleLinkClick}
+                  className="text-gray-900 hover:text-primary px-3 py-2 rounded-md text-md font-medium flex items-center"
+                >
+                  <IconPackage size={18} className="mr-1" /> Explore
+                </Link> */}
+
+                {user ? (
+                  <>
+                    {user.isAdmin ? (
+                      <>
+                        <Link
+                          to="/admin/products"
+                          onClick={handleLinkClick}
+                          className="flex items-center hover:text-primary"
+                        >
+                          <IconPackage className="mr-2" size={18} /> Manage Products
+                        </Link>
+                        <Link
+                          to="/admin/orders"
+                          onClick={handleLinkClick}
+                          className="flex items-center hover:text-primary"
+                        >
+                          <IconClipboardList className="mr-2" size={18} /> Manage Orders
+                        </Link>
+                      </>
+                    ) : (
+                      <Link
+                        to="/orders"
+                        onClick={handleLinkClick}
+                        className="flex items-center hover:text-primary"
+                      >
+                        <IconClipboardList className="mr-2" size={18} /> My Orders
+                      </Link>
+                    )}
+
+                    <Button variant="ghost" onClick={handleLogout} className="flex items-center">
+                      <IconLogout size={18} className="mr-2" /> Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={handleLinkClick}
+                      className="flex items-center hover:text-primary"
+                    >
+                      <IconUser className="mr-2" size={18} /> Login
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={handleLinkClick}
+                      className="flex items-center hover:text-primary"
+                    >
+                      <IconUserPlus className="mr-2" size={18} /> Signup
+                    </Link>
+                  </>
+                )}
               </SheetContent>
             </Sheet>
           </div>
