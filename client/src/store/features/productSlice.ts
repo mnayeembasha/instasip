@@ -136,7 +136,7 @@ export const editProduct = createAsyncThunk<ProductType, { id: string; data: Edi
   'product/editProduct',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.put(`/products/id/${id}`, data);
+      const res = await axiosInstance.put(`/products/${id}`, data);
       toast.success(res.data.message);
       return res.data.product;
     } catch (error) {

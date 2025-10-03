@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import HomeProductCard from './HomeProductCard';
 
 const preMixProducts = [
-  { name: 'Masala Tea', price: '₹20', image: 'https://cupji.com/cdn/shop/files/Namitafavourite_600x.jpg?v=1737123784' },
-  { name: 'Coffee', price: '₹25', image: 'https://cupji.com/cdn/shop/files/CupJi_Premix_RW-02_600x600.jpg?v=1757736159' },
-  { name: 'Cardamon Tea', price: '₹18', image: 'https://cupji.com/cdn/shop/files/26812_V-03_1_600x600.jpg?v=1757686218' }
+  { name: 'Masala Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487448/instasip/lkjopeknfhhx3vfce6ap.jpg' },
+  { name: 'Coffee', price: '₹25', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487431/instasip/n67g3hlumuutxtrq96hw.jpg' },
+  { name: 'Lemon Tea', price: '₹18', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487405/instasip/i7vacfkhpncjmibufu5l.jpg' }
 ];
 
 const greenTeaProducts = [
-  { name: 'Pomegranate', price: '₹22', image: 'https://cupji.com/cdn/shop/files/A7406587_600x600.jpg?v=1717648757' },
-  { name: 'Mint', price: '₹20', image: 'https://cupji.com/cdn/shop/files/A7406588_600x.jpg?v=1717648154' },
-  { name: 'Ginger Lemon', price: '₹24', image: 'https://cupji.com/cdn/shop/files/LEmonginger4_600x.jpg?v=1737116431' }
+  { name: 'Pomegranate Flavoured Green Tea', price: '₹22', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487382/instasip/ddwxuzan8zph3efgqccj.jpg' },
+  { name: 'Mint Flavoured Green Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487351/instasip/n5cqakcr6z0tsqrew4nk.jpg' },
+  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹24', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487329/instasip/v0seuojdg54ss0x7i0mm.jpg' }
 ];
 
 // Combine products for "All"

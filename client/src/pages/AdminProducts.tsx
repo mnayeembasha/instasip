@@ -110,8 +110,8 @@ const AdminProducts = () => {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <IconPackage className="w-10 h-10 text-primary" />
+              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3 tracking">
+                <IconPackage className="w-8 h-8 text-primary" />
                 Product Management
               </h1>
               <p className="text-gray-600">Manage your product inventory and availability</p>

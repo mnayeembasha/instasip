@@ -85,7 +85,7 @@ const Cart = () => {
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-bold text-lg">Total: &#8377;{total.toFixed(2)}</p>
+                  <p className="font-bold text-lg">Total: &#8377;{total?total.toFixed(2):0}</p>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
                   <Form {...form}>

@@ -6,6 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { type ProductType } from '@/types';
 import { useState } from 'react';
+import { IconLoader2 } from '@tabler/icons-react';
 
 const productSchema = z.object({
   name: z.string().min(2),
@@ -64,7 +65,7 @@ const ProductForm = ({ onSubmit, defaultValues, isLoading }: ProductFormProps) =
           <Input type="file" onChange={handleImageChange} />
           {imagePreview && <img src={imagePreview} alt="preview" className="mt-2 w-24 h-24 object-cover rounded" />}
         </FormItem>
-        <Button type="submit" disabled={isLoading} className="bg-primary text-white w-full">Save</Button>
+        <Button type="submit" disabled={isLoading} className="bg-primary text-white w-full">{isLoading ? <span className='flex gap-x-2 justify-center items-center'><IconLoader2 className="mr-2 h-4 w-4 animate-spin" /> Saving....</span>: <span>Save</span>}</Button>
       </form>
     </Form>
   );

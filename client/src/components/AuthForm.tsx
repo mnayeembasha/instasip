@@ -54,6 +54,24 @@ const AuthForm = ({ type }: AuthFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 animate-fade-in">
+        {/* Header Section */}
+        <div className="text-center mb-6">
+          {type === 'signup' ? (
+            <>
+              <h2 className="text-2xl font-bold text-accent">Create Account</h2>
+              <p className="text-sm text-muted-foreground">
+                Join us today and start your journey with ease
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold text-accent">Welcome Back</h2>
+              <p className="text-sm text-muted-foreground">
+                Login to continue exploring your favorite products
+              </p>
+            </>
+          )}
+        </div>
         {type === 'signup' && (
           <FormField
             control={form.control}

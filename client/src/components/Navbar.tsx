@@ -143,8 +143,9 @@ const Navbar = () => {
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" className="text-primary">
-                  <IconMenu2 size={22} className='text-2xl'/>
-                </Button>
+  <IconMenu2 className="h-16 w-16" /> {/* 64px */}
+</Button>
+
               </SheetTrigger>
               <SheetContent
                 side="right"

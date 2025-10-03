@@ -7,6 +7,7 @@ import { AxiosError } from 'axios';
 interface AuthState {
   user: UserType | null;
   isLoading: boolean;
+  isCheckingAuth:boolean;
 }
 
 interface ApiError {
@@ -16,6 +17,7 @@ interface ApiError {
 const initialState: AuthState = {
   user: null,
   isLoading: false,
+  isCheckingAuth:false
 };
 
 export const register = createAsyncThunk<UserType, { name: string; phone: string; password: string }, { rejectValue: ApiError }>(
@@ -110,13 +112,13 @@ const authSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
       })
-      .addCase(getMe.pending, (state) => { state.isLoading = true; })
+      .addCase(getMe.pending, (state) => { state.isCheckingAuth = true; })
       .addCase(getMe.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isCheckingAuth = false;
         state.user = action.payload;
       })
       .addCase(getMe.rejected, (state) => {
-        state.isLoading = false;
+        state.isCheckingAuth = false;
         state.user = null;
       });
   },
