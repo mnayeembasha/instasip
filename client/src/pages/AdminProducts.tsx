@@ -105,18 +105,18 @@ const AdminProducts = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         {/* Header Section */}
-        <div className="mb-8">
+        <div className="">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3 tracking">
+              {/* <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3 tracking">
                 <IconPackage className="w-8 h-8 text-primary" />
                 Product Management
               </h1>
-              <p className="text-gray-600">Manage your product inventory and availability</p>
+              <p className="text-gray-600">Manage your product inventory and availability</p> */}
             </div>
-<Button
+{/* <Button
   className="bg-gradient-to-r bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
   onClick={() => {
     setEditingProduct(null);
@@ -125,7 +125,7 @@ const AdminProducts = () => {
 >
   <IconPlus className="w-5 h-5 mr-2" />
   Add New Product
-</Button>
+</Button> */}
 <Dialog open={open} onOpenChange={handleDialogClose}>
   <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
@@ -216,7 +216,21 @@ const AdminProducts = () => {
           ))}
         </SelectContent>
       </Select>
-    </div>
+
+         </div>
+
+      {/* Add Product */}
+      <Button
+  className="rounded-xl bg-gradient-to-r bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
+  onClick={() => {
+    setEditingProduct(null);
+    setOpen(true);
+  }}
+>
+  <IconPlus className="w-5 h-5 mr-2" />
+  Add New Product
+</Button>
+
           </div>
         </Card>
 

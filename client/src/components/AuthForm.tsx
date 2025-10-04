@@ -8,6 +8,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login, register } from '@/store/features/authSlice';
 import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface AuthFormProps {
   type: 'login' | 'signup';
@@ -22,20 +23,22 @@ const signupSchema = loginSchema.extend({
   name: z.string().min(2, 'Name must be at least 2 characters'),
 });
 
-interface SignupFormData{
-    name:string;
-    phone:string;
-    password:string;
+interface SignupFormData {
+  name: string;
+  phone: string;
+  password: string;
 }
-interface LoginFormData{
-    phone:string;
-    password:string;
+
+interface LoginFormData {
+  phone: string;
+  password: string;
 }
+
 type AuthFormData = SignupFormData | LoginFormData;
 
 const AuthForm = ({ type }: AuthFormProps) => {
   const dispatch = useAppDispatch();
-  const { isLoading } = useAppSelector((state) => state.auth);
+  const { isLoading, user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -46,9 +49,23 @@ const AuthForm = ({ type }: AuthFormProps) => {
     defaultValues: type === 'login' ? { phone: '', password: '' } : { name: '', phone: '', password: '' },
   });
 
-  const onSubmit = (data: AuthFormData) => {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate(redirect);
+    }
+  }, [user, navigate, redirect]);
+
+  const onSubmit = async (data: AuthFormData) => {
     const action = type === 'login' ? login(data) : register(data as SignupFormData);
-    dispatch(action).then(() => navigate(redirect));
+    const result = await dispatch(action);
+
+    // Check if the action was successful
+    if (type === 'login' && login.fulfilled.match(result)) {
+      navigate(redirect);
+    } else if (type === 'signup' && register.fulfilled.match(result)) {
+      navigate(redirect);
+    }
   };
 
   return (
@@ -113,28 +130,28 @@ const AuthForm = ({ type }: AuthFormProps) => {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isLoading} className="w-full bg-accent text-white">
+        <Button type="submit" disabled={isLoading} className="w-full bg-accent text-white hover:bg-primary">
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           {type === 'login' ? 'Login' : 'Signup'}
         </Button>
 
-      <p className="text-center">
-        {type === "signup" ? (
-          <>
-            Already have an account?{" "}
-            <Link to="/login" className="text-accent">
-              Login
-            </Link>
-          </>
-        ) : (
-          <>
-            Don&apos;t have an account?{" "}
-            <Link to="/signup" className="text-accent">
-              Signup
-            </Link>
-          </>
-        )}
-      </p>
+        <p className="text-center">
+          {type === "signup" ? (
+            <>
+              Already have an account?{" "}
+              <Link to={`/login${redirect !== '/' ? `?redirect=${redirect}` : ''}`} className="text-accent hover:underline">
+                Login
+              </Link>
+            </>
+          ) : (
+            <>
+              Don&apos;t have an account?{" "}
+              <Link to={`/signup${redirect !== '/' ? `?redirect=${redirect}` : ''}`} className="text-accent hover:underline">
+                Signup
+              </Link>
+            </>
+          )}
+        </p>
       </form>
     </Form>
   );

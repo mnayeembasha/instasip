@@ -2,15 +2,16 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
 import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
 import { Toaster } from "react-hot-toast";
 import Home from "@/pages/Home";
 import Signup from "@/pages/SignUp";
 import Login from "@/pages/Login";
 import Products from "@/pages/Products";
 import Cart from "@/pages/Cart";
-import AdminOrders from "@/pages/AdminOrders";
-import MyOrders from "@/pages/MyOrders";
-import AdminProducts from "./pages/AdminProducts";
+import Profile from "@/pages/Profile";
+import Contact from "@/pages/Contact";
+import Admin from "@/pages/Admin";
 import ProductDetails from "./pages/ProductDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
@@ -27,18 +28,25 @@ const AppContent = () => {
   }, [dispatch]);
 
   if (isCheckingAuth) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   return (
     <Router>
       <Navbar />
+      <BottomNav />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:slug" element={<ProductDetails />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/contact" element={<Contact />} />
 
         {/* Protected routes */}
         <Route
@@ -49,27 +57,13 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin route */}
         <Route
-          path="/orders"
-          element={
-            <ProtectedRoute>
-              <MyOrders />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/products"
+          path="/admin"
           element={
             <ProtectedRoute adminOnly>
-              <AdminProducts />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/orders"
-          element={
-            <ProtectedRoute adminOnly>
-              <AdminOrders />
+              <Admin />
             </ProtectedRoute>
           }
         />

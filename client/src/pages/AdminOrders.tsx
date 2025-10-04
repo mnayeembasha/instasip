@@ -102,9 +102,9 @@ const AdminOrders = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 pt-24">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         {/* Header Section */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3 tracking-tight">
@@ -114,7 +114,7 @@ const AdminOrders = () => {
               <p className="text-gray-600">Track and manage customer orders</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Filter Section */}
         <Card className="mb-8 p-6 border-0 bg-white">
@@ -178,7 +178,7 @@ const AdminOrders = () => {
                       className="hover:bg-blue-50/50 transition-colors border-b"
                     >
                       <TableCell className="font-medium text-gray-900 py-4">
-                        <span className="font-mono text-sm">{order._id}</span>
+                        <span className="font-mono text-sm">{order._id.slice(-8)}</span>
                       </TableCell>
                       <TableCell className="font-medium text-gray-700">
                         {(order.user as UserType).name}
