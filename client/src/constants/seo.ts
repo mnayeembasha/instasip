@@ -5,7 +5,7 @@ export const SEO_CONFIG: Record<
   { title: string; description: string; path: string }
 > = {
   "/": {
-    title: "InstaSip – Ready-to-Use Organic Tea & Coffee",
+    title: "InstaSip | Ready-to-Use Organic Tea & Coffee",
     description:
       "Enjoy eco-friendly ready-to-use tea and coffee cups by InstaSip. Just add hot water — no mess, no strainers, pure taste!",
     path: `${DOMAIN}/`,
