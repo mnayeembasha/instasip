@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prerender":"bun run prerender.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -26,6 +27,7 @@
     "lucide-react": "^latest",
     "react": "^18",
     "react-dom": "^18",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.63.0",
     "react-hot-toast": "^latest",
     "react-redux": "^latest",
@@ -33,6 +35,7 @@
     "tailwind-merge": "^latest",
     "tailwindcss": "^4.1.13",
     "tailwindcss-animate": "^latest",
+    "vite-plugin-prerender": "^1.0.8",
     "zod": "^4.1.11"
   },
   "devDependencies": {

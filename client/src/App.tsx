@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { useEffect } from "react";
 import { getMe } from "./store/features/authSlice";
 import LoadingSpinner from "./components/LoadingSpinner";
+import SEOManager from "./components/SEOManager";
 
 const AppContent = () => {
   const dispatch = useAppDispatch();
@@ -37,6 +38,7 @@ const AppContent = () => {
 
   return (
     <Router>
+      <SEOManager/>
       <Navbar />
       <BottomNav />
       <Routes>

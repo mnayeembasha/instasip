@@ -7,7 +7,7 @@ const ID_ERROR_MESSAGE = 'Invalid Product ID';
 
 export const getProducts = async (req: Request, res: Response) => {
     try {
-        const { category, search, sortBy } = req.query;
+        const { category, search, sortBy, price } = req.query;
 
         const filter: any = { isActive: true };
 
@@ -26,6 +26,13 @@ export const getProducts = async (req: Request, res: Response) => {
         let sortOption: any = { createdAt: -1 };
         if (sortBy === "oldest") {
             sortOption = { createdAt: 1 };
+        }
+
+        // Add price sorting
+        if (price === "lowtohigh") {
+            sortOption = { price: 1 };
+        } else if (price === "hightolow") {
+            sortOption = { price: -1 };
         }
 
         const products = await Product.find(filter).sort(sortOption);
@@ -292,5 +299,3 @@ export const changeProductStatus = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
-

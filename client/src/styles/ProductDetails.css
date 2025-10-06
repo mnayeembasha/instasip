@@ -1,0 +1,36 @@
+.image-zoom-area {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 1.5rem;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease-in-out;
+  cursor: crosshair;
+}
+
+.zoom-lens {
+  position: absolute;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  background-repeat: no-repeat;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.image-zoom-area:hover .zoom-lens {
+  display: block;
+}

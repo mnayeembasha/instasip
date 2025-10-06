@@ -13,9 +13,12 @@ import Footer from '@/components/Footer';
 import WhatsAppIcon from '@/components/WhatsappIcon';
 import Hero from '@/components/Hero';
 
+
 const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background text-gray-800">
+
+
+      <div className="min-h-screen bg-background text-gray-800">
       <main>
         <Hero />
         <DiscoverProducts />

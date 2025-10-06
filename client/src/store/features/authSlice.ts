@@ -82,7 +82,8 @@ export const getMe = createAsyncThunk<UserType, void, { rejectValue: ApiError }>
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.response?.status !== 401) {
-          toast.error(error.response?.data?.message || 'Failed to fetch user');
+         // toast.error(error.response?.data?.message || 'Failed to fetch user');
+         console.log(error);
         }
         return rejectWithValue({ message: error.response?.data?.message || 'Failed to fetch user' });
       }

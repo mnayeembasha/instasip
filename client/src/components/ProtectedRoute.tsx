@@ -18,7 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminOnly = f
   }
 
   if (!user) {
-    toast.error("Login to continue ...");
+   // toast.error("Login to continue ...");
     return <Navigate to={`/login?redirect=${location.pathname}`} replace />;
   }
 

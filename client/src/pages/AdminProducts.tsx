@@ -157,7 +157,7 @@ const AdminProducts = () => {
         placeholder="Search products..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="pl-12 h-12 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 transition-all"
+        className="pl-12 h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary transition-all"
       />
     </div>
 
@@ -165,7 +165,7 @@ const AdminProducts = () => {
     <div className="relative flex-1 flex justify-center items-center">
       <IconCircleCheck className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
       <Select value={status} onValueChange={setStatus}>
-        <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 w-full">
+        <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-primary focus:ring-primary w-full">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent className="rounded-xl">
@@ -195,7 +195,7 @@ const AdminProducts = () => {
     <div className="relative flex-1 flex justify-center items-center">
       <IconCategory className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
       <Select value={category} onValueChange={setCategory}>
-        <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 w-full">
+        <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-primary focus:ring-primary w-full">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent className="rounded-xl">

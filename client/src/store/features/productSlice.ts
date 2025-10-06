@@ -40,6 +40,7 @@ interface FetchProductsParams {
   category?: string;
   search?: string;
   sortBy?: string;
+  price?: string;
 }
 
 export const fetchProducts = createAsyncThunk<ProductType[], FetchProductsParams, { rejectValue: ApiError }>(

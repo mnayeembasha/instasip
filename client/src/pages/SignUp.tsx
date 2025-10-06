@@ -2,6 +2,7 @@ import AuthForm from '@/components/AuthForm';
 
 const Signup = () => {
   return (
+
     <div className="min-h-screen flex justify-center items-between w-full">
       <div className="w-full flex flex-col lg:flex-row items-center justify-center  animate-fade-in">
         <div className="hidden lg:block lg:w-1/2 w-full h-full pt-10">

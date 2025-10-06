@@ -7,9 +7,15 @@ import { Button } from '@/components/ui/button';
 import { fetchProductBySlug, clearCurrentProduct } from '@/store/features/productSlice';
 import { addToCart } from '@/store/features/cartSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import '@/styles/ProductDetails.css';
+import ImageZoomLens from '@/components/ImageZoomLens';
+import { productSEO } from '@/constants/seo';
+import { Helmet } from 'react-helmet-async';
+
 
 const ProductDetails = () => {
   const { slug } = useParams<{ slug: string }>();
+
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -18,6 +24,9 @@ const ProductDetails = () => {
   );
 
   const [quantity, setQuantity] = useState(1);
+
+
+
 
   useEffect(() => {
     if (slug) {
@@ -84,28 +93,46 @@ const ProductDetails = () => {
 
   const marketingPrice = currentProduct.price * 1.3;
 
+  const seo = productSEO[slug as keyof typeof productSEO];
+
+  if (!seo) return null; // fallback if product not found
+
+
   return (
+    <>
+    <Helmet>
+      <title>{seo.title}</title>
+      <meta name="description" content={seo.description} />
+      <link rel="canonical" href={seo.canonical} />
+      <meta property="og:image" content={seo.image} />
+      <meta property="og:title" content={seo.title} />
+      <meta property="og:description" content={seo.description} />
+      <meta property="og:url" content={seo.canonical} />
+    </Helmet>
     <div className=" md:py-12 px-4 sm:px-6 lg:px-8 md:pt-20">
       <div className="max-w-7xl mx-auto">
         <div className="overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2 py-4 md:px-8 md:py-8">
             {/* Left: Image */}
             <div className="flex justify-center">
-              <div className="w-full h-[500px] rounded-3xl overflow-hidden flex items-center justify-center bg-white">
-                <img
-                  src={currentProduct.image || '/placeholder-product.jpg'}
-                  alt={currentProduct.name}
-                  className="max-w-full max-h-full object-contain rounded-xl"
-                />
-              </div>
+                {/* <div className="w-full h-[500px] rounded-3xl overflow-hidden flex items-center justify-center bg-white">
+                  <img
+                    src={currentProduct.image || '/placeholder-product.jpg'}
+                    alt={currentProduct.name}
+                    className="max-w-full max-h-full object-contain rounded-xl"
+                  />
+                </div> */}
+                <div className="w-full h-[500px] rounded-3xl overflow-hidden flex items-center justify-center bg-white">
+  <ImageZoomLens
+    src={currentProduct.image || '/placeholder-product.jpg'}
+    alt={currentProduct.name}
+    className="w-full h-full flex items-center justify-center"
+  />
+</div>
 
-              {/* <div className="w-full h-[500px] rounded-xl overflow-hidden">
-                <img
-                  src={currentProduct.image || '/placeholder-product.jpg'}
-                  alt={currentProduct.name}
-                  className="w-full h-full object-cover"
-                />
-              </div> */}
+
+
+
 
 
             </div>
@@ -208,6 +235,7 @@ const ProductDetails = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
