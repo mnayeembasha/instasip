@@ -1,6 +1,6 @@
 import { type Response } from "express";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config";
+import { JWT_SECRET,NODE_ENV } from "../config";
 
 export const generateTokenAndSetCookie = (userId: string, res: Response) => {
     const token = jwt.sign({ userId }, JWT_SECRET!, { expiresIn: "7d" });
@@ -8,7 +8,7 @@ export const generateTokenAndSetCookie = (userId: string, res: Response) => {
     res.cookie("jwt", token, {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true, // prevent XSS attacks
-        sameSite: "strict", // CSRF attacks
-        secure: process.env.NODE_ENV === "production", // HTTPS in production
+        secure: NODE_ENV === "production", 
+        sameSite: NODE_ENV === "production" ? "none" : "lax",
     });
 };
