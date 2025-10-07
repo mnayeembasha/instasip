@@ -1,0 +1,16 @@
+# robots.txt for https://instasip.vercel.app
+# Allow all crawlers to index the site
+
+User-agent: *
+Allow: /
+
+# Disallow admin and private pages
+Disallow: /admin
+Disallow: /admin-products
+Disallow: /admin-orders
+Disallow: /profile
+Disallow: /cart
+Disallow: /myorders
+
+# Sitemap location
+Sitemap: https://instasip.vercel.app/sitemap.xml

@@ -1,0 +1,22 @@
+{
+  "name": "InstaSip",
+  "short_name": "InstaSip",
+  "description": "Eco-friendly ready-to-use tea and coffee cups. Just add hot water — no mess, pure taste!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#58c4dc",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
