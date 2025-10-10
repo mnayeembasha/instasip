@@ -48,5 +48,16 @@ export const orderCreateZodSchema = z.object({
         zipCode: z.string({ message: "Zip code is required" }),
         country: z.string().optional(),
     }),
+    razorpayOrderId: z.string({ message: "Payment order ID is required" }),
+    razorpayPaymentId: z.string({ message: "Payment ID is required" }),
+    razorpaySignature: z.string({ message: "Payment signature is required" }),
 });
 
+export const addToCartZodSchema = z.object({
+  productId: z.string().min(1, "Product ID is required"),
+  quantity: z.number().min(1, "Quantity must be at least 1").int("Quantity must be an integer"),
+});
+
+export const updateCartItemZodSchema = z.object({
+  quantity: z.number().min(1, "Quantity must be at least 1").int("Quantity must be an integer"),
+});

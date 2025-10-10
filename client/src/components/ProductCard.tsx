@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { addToCart } from '@/store/features/cartSlice';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { type ProductType } from '@/types';
 import toast from 'react-hot-toast';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: ProductType;
@@ -16,14 +16,37 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(1);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+//  const location = useLocation();
 
-  const handleAddToCart = () => {
+  const { user:currentUser } = useAppSelector((state) => state.auth);
+  const { isAddingToCart } = useAppSelector((state) => state.cart);
+
+  const handleAddToCart = async () => {
+    // Check if user is logged in
+    if (!currentUser) {
+      toast.error('Please login to add items to cart');
+      navigate(`/login?redirect=/products`);
+      return;
+    }
+
     if (quantity < 1 || quantity > product.stock) {
       toast.error('Invalid quantity');
       return;
     }
-    dispatch(addToCart({ product, quantity }));
-    toast.success('Added to cart');
+
+    try {
+      await dispatch(addToCart({
+        productId: product._id,
+        quantity
+      })).unwrap();
+      toast.success('Added to cart');
+      setQuantity(1); // Reset quantity after successful add
+    } catch (error: unknown) {
+      if(error instanceof Error){
+        toast.error(error.message || 'Failed to add to cart');
+      }
+    }
   };
 
   return (
@@ -51,8 +74,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </Link>
         <p className="text-xs text-gray-400 uppercase">{product.category}</p>
         <p className="text-xl font-bold text-primary">&#8377; {product.price.toFixed(2)}</p>
-        {/* <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p> */}
-        {/* <p className="text-xs text-gray-500">Stock: {product.stock}</p> */}
       </CardContent>
 
       {/* Footer Controls */}
@@ -64,14 +85,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
           value={quantity}
           onChange={(e) => setQuantity(Number(e.target.value))}
           className="w-20 rounded-lg"
-          disabled={product.stock === 0}
+          disabled={product.stock === 0 || isAddingToCart}
         />
         <Button
           onClick={handleAddToCart}
           className="bg-primary text-white rounded-lg flex-1"
-          disabled={product.stock === 0}
+          disabled={product.stock === 0 || isAddingToCart}
         >
-          {product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
+          {isAddingToCart ? 'Adding...' : product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
         </Button>
       </CardFooter>
     </Card>

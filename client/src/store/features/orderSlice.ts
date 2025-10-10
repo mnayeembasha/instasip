@@ -75,6 +75,9 @@ interface CreateOrderData {
     zipCode: string;
     country: string;
   };
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
 }
 
 export const createOrder = createAsyncThunk<OrderType, CreateOrderData, { rejectValue: ApiError }>(
@@ -170,7 +173,10 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.fulfilled, (state, action) => {
         state.isCancellingOrder = false;
         const index = state.orders.findIndex(o => o._id === action.payload);
-        if (index !== -1) state.orders[index].status = 'cancelled';
+        if (index !== -1) {
+          state.orders[index].status = 'cancelled';
+          state.orders[index].paymentStatus = 'refunded';
+        }
       })
       .addCase(cancelOrder.rejected, (state, action) => {
         state.isCancellingOrder = false;

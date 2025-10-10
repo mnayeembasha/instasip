@@ -161,6 +161,31 @@ const OrderDetailsModal = ({ open, onOpenChange, order }: OrderDetailsModalProps
             </div>
           </div>
 
+          {/* Payment Status */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <IconCreditCard className="w-5 h-5 text-green-600" />
+              <h3 className="font-semibold text-base">Payment Status</h3>
+            </div>
+            <div className={`rounded-lg p-4 ${
+              order.paymentStatus === 'paid' ? 'bg-green-100' :
+              order.paymentStatus === 'refunded' ? 'bg-blue-100' :
+              order.paymentStatus === 'failed' ? 'bg-red-100' : 'bg-yellow-100'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 font-medium">Status</span>
+                <Badge className={`capitalize ${
+                  order.paymentStatus === 'paid' ? 'bg-green-600 text-white' :
+                  order.paymentStatus === 'refunded' ? 'bg-blue-600 text-white' :
+                  order.paymentStatus === 'failed' ? 'bg-red-600 text-white' : 'bg-yellow-600 text-white'
+                }`}>
+                  {order.paymentStatus}
+                </Badge>
+              </div>
+              <p className="text-xs text-gray-600 mt-2">Payment ID: {order.razorpayPaymentId}</p>
+            </div>
+          </div>
+
           {/* Order Date */}
           <div>
             <div className="flex items-center gap-2 mb-3">

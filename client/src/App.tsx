@@ -19,14 +19,21 @@ import { useEffect } from "react";
 import { getMe } from "./store/features/authSlice";
 import LoadingSpinner from "./components/LoadingSpinner";
 import SEOManager from "./components/SEOManager";
+import { fetchCart } from "./store/features/cartSlice";
 
 const AppContent = () => {
   const dispatch = useAppDispatch();
-  const { isCheckingAuth } = useAppSelector((state) => state.auth);
+  const { isCheckingAuth,user: currentUser } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(getMe());
   }, [dispatch]);
+
+  useEffect(()=>{
+     if(!isCheckingAuth && currentUser){
+        dispatch(fetchCart());
+     }	
+  },[dispatch,currentUser,isCheckingAuth]);
 
   if (isCheckingAuth) {
     return (

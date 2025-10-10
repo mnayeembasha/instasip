@@ -1,13 +1,16 @@
 import { type Request, type Response } from "express";
 import { Order, type OrderDocument } from "../models/Order";
 import { Product } from "../models/Product";
+import { Payment } from "../models/Payment";
 import mongoose from "mongoose";
 import { validateObjectId } from "../utils/validateObjectId";
+import { Cart } from "../models/Cart";
+import crypto from "crypto";
+import { RAZORPAY_KEY_SECRET } from "../config";
 
 const ID_ERROR_MESSAGE = 'Invalid Order ID';
 
-
-const validateAndPrepareItem = async (item: any, session: mongoose.ClientSession) => {
+const validateAndPrepareItem = async (item: { product: string; quantity: number }, session: mongoose.ClientSession) => {
     if (!mongoose.Types.ObjectId.isValid(item.product)) {
         throw new Error(`Invalid product ID: ${item.product}`);
     }
@@ -36,8 +39,34 @@ const validateAndPrepareItem = async (item: any, session: mongoose.ClientSession
 };
 
 export const createOrder = async (req: Request, res: Response) => {
-    const { items, shippingAddress } = req.body;
+    const { items, shippingAddress, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
     const userId = req.user?._id;
+
+    // Verify payment signature
+    const body = razorpayOrderId + "|" + razorpayPaymentId;
+    const expectedSignature = crypto
+        .createHmac("sha256", RAZORPAY_KEY_SECRET!)
+        .update(body)
+        .digest("hex");
+
+    if (expectedSignature !== razorpaySignature) {
+        // Save failed payment attempt
+        try {
+            await Payment.create({
+                user: userId,
+                razorpayOrderId,
+                razorpayPaymentId,
+                razorpaySignature,
+                amount: 0,
+                status: 'failed',
+                errorCode: 'SIGNATURE_MISMATCH',
+                errorDescription: 'Payment signature verification failed'
+            });
+        } catch (error) {
+            console.error("Error saving failed payment:", error);
+        }
+        return res.status(400).json({ message: "Payment verification failed. Please contact support." });
+    }
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -54,10 +83,40 @@ export const createOrder = async (req: Request, res: Response) => {
         }
 
         // Create order
-        const orderData = { user: userId, items: orderItems, totalAmount, shippingAddress };
+        const orderData = {
+            user: userId,
+            items: orderItems,
+            totalAmount,
+            shippingAddress,
+            status:'confirmed',
+            paymentStatus: 'paid',
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature
+        };
         const [createdOrder] = await Order.create([orderData], { session });
 
         if (!createdOrder) throw new Error("Failed to create order");
+
+        // Save payment record
+        await Payment.create([{
+            user: userId,
+            order: createdOrder._id,
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature,
+            amount: totalAmount,
+            currency: 'INR',
+            status: 'captured',
+            contact: req.user?.phone
+        }], { session });
+
+        // Clear user's cart after successful order
+        await Cart.findOneAndUpdate(
+            { user: userId },
+            { items: [] },
+            { session }
+        );
 
         await session.commitTransaction();
         session.endSession();
@@ -67,12 +126,13 @@ export const createOrder = async (req: Request, res: Response) => {
             .populate("user", "-password")
             .populate("items.product");
 
-        return res.status(201).json({ message: "Order created successfully", order: populatedOrder });
-    } catch (error: any) {
+        return res.status(201).json({ message: "Order placed successfully", order: populatedOrder });
+    } catch (error: unknown) {
         await session.abortTransaction();
         session.endSession();
-        console.error("Error in createOrder controller:", error.message);
-        res.status(400).json({ message: error.message || "Internal Server Error" });
+        console.error("Error in createOrder controller:", error);
+        const message = error instanceof Error ? error.message : "Internal Server Error";
+        res.status(400).json({ message });
     }
 };
 
@@ -87,7 +147,7 @@ export const getMyOrders = async (req: Request, res: Response) => {
 
         const [orders, totalOrders] = await Promise.all([
             Order.find({ user: userId })
-                .populate('user','-password')
+                .populate('user', '-password')
                 .populate('items.product')
                 .sort({ createdAt: -1 })
                 .skip(skip)
@@ -127,13 +187,12 @@ export const getOrderById = async (req: Request, res: Response) => {
 
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
-        }else{
-            return res.status(200).json({
-                message: "Order fetched successfully",
-                order
-            });
         }
 
+        return res.status(200).json({
+            message: "Order fetched successfully",
+            order
+        });
     } catch (error) {
         console.error("Error in getOrderById controller", error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -164,6 +223,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
             });
         }
 
+        // Restore stock
         for (const item of order.items) {
             await Product.updateOne(
                 { _id: item.product },
@@ -171,18 +231,32 @@ export const cancelOrder = async (req: Request, res: Response) => {
                 { session }
             );
         }
+
+        // Update order status
         await Order.updateOne(
             { _id: orderId },
-            { $set: { status: 'cancelled' } },
+            { $set: { status: 'cancelled', paymentStatus: 'refunded' } },
+            { session }
+        );
+
+        // Update payment record
+        await Payment.updateOne(
+            { order: orderId },
+            {
+                $set: {
+                    status: 'refunded',
+                    refundAmount: order.totalAmount,
+                    refundedAt: new Date()
+                }
+            },
             { session }
         );
 
         await session.commitTransaction();
 
         return res.status(200).json({
-            message: "Order cancelled successfully"
+            message: "Order cancelled successfully. Refund will be processed within 5-7 business days."
         });
-
     } catch (error) {
         await session.abortTransaction();
         console.error("Error in cancelOrder controller", error);
@@ -197,16 +271,14 @@ export const getAllOrders = async (req: Request, res: Response) => {
     try {
         const { status, userId } = req.query;
 
-        // Build filter
-        const filter: any = {};
-        if (status && status !== 'all') filter.status = status;
-        if (userId) filter.user = userId;
+        const filter: Record<string, string> = {};
+        if (status && status !== 'all') filter.status = status as string;
+        if (userId) filter.user = userId as string;
 
-        // Fetch all orders matching filter and populate
         const orders = await Order.find(filter)
             .populate('user', '-password')
             .populate('items.product')
-            .sort({ createdAt: -1 }); // latest first
+            .sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Orders fetched successfully",
@@ -230,9 +302,8 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
 
     try {
-        const updateData: any = { status };
+        const updateData: Record<string, string | Date> = { status };
 
-        // Set delivered date if status is delivered
         if (status === 'delivered') {
             updateData.deliveredAt = new Date();
         }

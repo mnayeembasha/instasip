@@ -19,6 +19,9 @@ export interface OrderDocument extends mongoose.Document {
         country: string;
     };
     paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
     orderDate: Date;
     deliveredAt?: Date;
 }
@@ -69,6 +72,18 @@ const orderSchema = new mongoose.Schema<OrderDocument>({
         type: String,
         enum: ['pending', 'paid', 'failed', 'refunded'],
         default: 'pending'
+    },
+    razorpayOrderId: {
+        type: String,
+        required: true
+    },
+    razorpayPaymentId: {
+        type: String,
+        required: true
+    },
+    razorpaySignature: {
+        type: String,
+        required: true
     },
     orderDate: {
         type: Date,

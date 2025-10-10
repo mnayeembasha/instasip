@@ -1,11 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap');
+/* Import all the fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Geist:wght@100..900&family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
 @import "tailwindcss";
 
-*{
-  font-family: 'Manrope', sans-serif;
+html,body{
+  font-family:'Manrope','Geist','Inter Tight','Inter','DM Sans','Plus Jakarta Sans', 'Manrope', sans-serif;
+  letter-spacing:-0.025em;
 }
 .font-archivo{
-    font-family: "Archivo Black", sans-serif;
+    font-family: "Archivo Black", sans-serif !important;
 }
 @import "tw-animate-css";
 

@@ -18,7 +18,7 @@ const App: React.FC = () => {
   return (
 
 
-      <div className="min-h-screen bg-background text-gray-800">
+      <div className="min-h-screen bg-background text-gray-800 pb-15">
       <main>
         <Hero />
         <DiscoverProducts />

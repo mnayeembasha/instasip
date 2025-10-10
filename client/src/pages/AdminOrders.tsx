@@ -69,6 +69,16 @@ const AdminOrders = () => {
     setDetailsModalOpen(true);
   };
 
+  const getPaymentStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    paid: 'bg-green-100 text-green-700 border-green-200',
+    failed: 'bg-red-100 text-red-700 border-red-200',
+    refunded: 'bg-blue-100 text-blue-700 border-blue-200'
+  };
+  return colors[status] || 'bg-gray-100 text-gray-700 border-gray-200';
+};
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -168,7 +178,9 @@ const AdminOrders = () => {
                     <TableHead className="font-bold text-gray-700">Total Amount</TableHead>
                     <TableHead className="font-bold text-gray-700">Status</TableHead>
                     <TableHead className="font-bold text-gray-700">Update Status</TableHead>
+                    <TableHead className="font-bold text-gray-700">Payment Status</TableHead>
                     <TableHead className="font-bold text-gray-700">Info</TableHead>
+
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -221,6 +233,12 @@ const AdminOrders = () => {
                           </SelectContent>
                         </Select>
                       </TableCell>
+                      <TableCell>
+  <Badge className={`capitalize ${getPaymentStatusColor(order.paymentStatus)}`}>
+    {order.paymentStatus}
+  </Badge>
+</TableCell>
+
                       <TableCell>
                         <Button
                           variant="ghost"
