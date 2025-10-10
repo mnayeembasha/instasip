@@ -1,0 +1,6 @@
+name = "instasip-server"
+main = "dist/index.js"
+compatibility_date = "2025-10-10"
+
+[build]
+command = "bun install && bun run build"
