@@ -15,48 +15,28 @@ const __dirname = path.resolve();
 const app = express();
 
 app.use(
-  '/api/payment/webhook',
-  express.raw({ type: 'application/json' })
+  "/api/payment/webhook",
+  express.raw({ type: "application/json" })
 );
 
-// ✅ Dynamic CORS based on environment
-const allowedOrigin =
-  NODE_ENV === "development"
-    ? "http://localhost:5173"
-    : "https://instasip.vercel.app";
-
-// app.use(cors({
-//   origin: allowedOrigin,
-//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//   credentials: true
-// }));
-
-app.use((req, res, next) => {
-  // Skip CORS for webhook route since Razorpay doesn't send Origin header
-  if (req.path === '/api/payment/webhook') {
-    return next();
-  }
-
-  // Apply CORS for all other routes
+// ✅ Allow both instasip domains
+app.use(
   cors({
-    origin: allowedOrigin,
+    origin: ["https://instasip.in", "https://www.instasip.in"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    credentials: true
-  })(req, res, next);
-});
+    credentials: true,
+  })
+);
 
-
-
-app.use(express.json({ limit: '7mb' }));
-app.use(express.urlencoded({ extended: true, limit: '7mb' }));
+app.use(express.json({ limit: "7mb" }));
+app.use(express.urlencoded({ extended: true, limit: "7mb" }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
-app.use('/api/cart', cartRoutes);
+app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
-
 
 // ❌ Frontend serving logic commented out
 // if (NODE_ENV === "production") {
@@ -68,16 +48,16 @@ app.use("/api/payment", paymentRoutes);
 
 // Error handling
 app.use((err: any, req: Request, res: Response, next: any) => {
-    console.error("Unhandled error:", err);
-    res.status(500).json({ message: "Internal Server Error" });
+  console.error("Unhandled error:", err);
+  res.status(500).json({ message: "Internal Server Error" });
 });
 
 app.use((req: Request, res: Response) => {
-    res.status(404).json({ message: "Page Not Found" });
+  res.status(404).json({ message: "Page Not Found" });
 });
 
 // Start server & connect DB
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    connectDB();
+  console.log(`Server is running on http://localhost:${PORT}`);
+  connectDB();
 });
