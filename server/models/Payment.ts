@@ -44,7 +44,9 @@ const paymentSchema = new mongoose.Schema<PaymentDocument>({
     },
     razorpaySignature: {
         type: String,
-        required: true
+        required: true,
+        default:'pending' //default value to prevent validation errors.
+
     },
     amount: {
         type: Number,
@@ -94,4 +96,10 @@ paymentSchema.index({ razorpayOrderId: 1 });
 paymentSchema.index({ razorpayPaymentId: 1 });
 paymentSchema.index({ status: 1 });
 
+paymentSchema.pre('save', function(next) {
+  if (!this.razorpaySignature) {
+    this.razorpaySignature = 'webhook_generated';
+  }
+  next();
+});
 export const Payment = mongoose.model<PaymentDocument>("Payment", paymentSchema);

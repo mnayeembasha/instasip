@@ -5,73 +5,73 @@
 >
   <!-- Home -->
   <url>
-    <loc>https://instasip.vercel.app/</loc>
+    <loc>https://www.instasip.in/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Products Page -->
   <url>
-    <loc>https://instasip.vercel.app/products</loc>
+    <loc>https://www.instasip.in/products</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Product Details -->
   <url>
-    <loc>https://instasip.vercel.app/products/masala-tea</loc>
+    <loc>https://www.instasip.in/products/masala-tea</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/products/coffee</loc>
+    <loc>https://www.instasip.in/products/coffee</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/products/lemon-tea</loc>
+    <loc>https://www.instasip.in/products/lemon-tea</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/products/pomegranate-flavoured-green-tea</loc>
+    <loc>https://www.instasip.in/products/pomegranate-flavoured-green-tea</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/products/mint-flavoured-green-tea</loc>
+    <loc>https://www.instasip.in/products/mint-flavoured-green-tea</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/products/ginger-lemon-flavoured-green-tea</loc>
+    <loc>https://www.instasip.in/products/ginger-lemon-flavoured-green-tea</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Other pages -->
   <url>
-    <loc>https://instasip.vercel.app/login</loc>
+    <loc>https://www.instasip.in/login</loc>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/signup</loc>
+    <loc>https://www.instasip.in/signup</loc>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/contact</loc>
+    <loc>https://www.instasip.in/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/cart</loc>
+    <loc>https://www.instasip.in/cart</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://instasip.vercel.app/profile</loc>
+    <loc>https://www.instasip.in/profile</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

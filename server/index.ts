@@ -14,17 +14,38 @@ import path from "path";
 const __dirname = path.resolve();
 const app = express();
 
+app.use(
+  '/api/payment/webhook',
+  express.raw({ type: 'application/json' })
+);
+
 // ✅ Dynamic CORS based on environment
 const allowedOrigin =
   NODE_ENV === "development"
     ? "http://localhost:5173"
     : "https://instasip.vercel.app";
 
-app.use(cors({
-  origin: allowedOrigin,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  credentials: true
-}));
+// app.use(cors({
+//   origin: allowedOrigin,
+//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//   credentials: true
+// }));
+
+app.use((req, res, next) => {
+  // Skip CORS for webhook route since Razorpay doesn't send Origin header
+  if (req.path === '/api/payment/webhook') {
+    return next();
+  }
+
+  // Apply CORS for all other routes
+  cors({
+    origin: allowedOrigin,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true
+  })(req, res, next);
+});
+
+
 
 app.use(express.json({ limit: '7mb' }));
 app.use(express.urlencoded({ extended: true, limit: '7mb' }));

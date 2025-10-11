@@ -1,4 +1,4 @@
-# robots.txt for https://instasip.vercel.app
+# robots.txt for https://www.instasip.in
 # Allow all crawlers to index the site
 
 User-agent: *
@@ -13,4 +13,5 @@ Disallow: /cart
 Disallow: /myorders
 
 # Sitemap location
-Sitemap: https://instasip.vercel.app/sitemap.xml
+Sitemap: https://www.instasip.in/sitemap.xml
+
