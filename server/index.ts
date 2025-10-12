@@ -19,38 +19,26 @@ app.use(
   express.raw({ type: 'application/json' })
 );
 
-const allowedOrigin = NODE_ENV==="development"?"http://localhost:5173":['https://instasip.in','https://www.instasip.in'];
-app.use(cors({
-    origin: allowedOrigin,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    credentials: true
-}));
+const allowedOrigins = NODE_ENV === "development"
+  ? ["http://localhost:5173"]
+  : ["https://instasip.in", "https://www.instasip.in"];
 
-// Handle preflight requests
-app.options("*", cors({
-    origin: allowedOrigin,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    credentials: true
-}));
+// Custom CORS middleware to handle multiple origins and credentials
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With");
+    res.header("Access-Control-Expose-Headers", "Set-Cookie,Authorization");
+  }
 
+  // Handle preflight requests
+  if (req.method === "OPTIONS") return res.sendStatus(204);
 
-
-// app.use((req, res, next) => {
-//   // Skip CORS for webhook route since Razorpay doesn't send Origin header
-//   if (req.path === `${routerPrefix}/payment/webhook`) {
-//     return next();
-//   }
-
-//   cors({
-//     origin: allowedOrigin,
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//     credentials: true
-//   })(req, res, next);
-// });
-
-
-
-
+  next();
+});
 
 app.use(express.json({ limit: '7mb' }));
 app.use(express.urlencoded({ extended: true, limit: '7mb' }));
@@ -70,10 +58,9 @@ app.use(`${routerPrefix}/cart`, cartRoutes);
 app.use(`${routerPrefix}/orders`, orderRoutes);
 app.use(`${routerPrefix}/payment`, paymentRoutes);
 
-
 app.use((err: any, req: Request, res: Response, next: any) => {
     console.error("Unhandled error:", err);
-      console.log("Incoming request:", req.method, req.path);
+    console.log("Incoming request:", req.method, req.path);
     res.status(500).json({ message: "Internal Server Error" });
 });
 
