@@ -62,4 +62,14 @@ app.use((req: Request, res: Response) => {
 //     connectDB();
 // });
 connectDB();
-export const handler = serverless(app);
+export default app;
+
+// if (process.env.NODE_DEPLOY !== "lambda") {
+//   const PORT = process.env.PORT;
+//   import("./lib/db").then(({ connectDB }) => {
+//     app.listen(PORT, () => {
+//       console.log(`Server running on http://localhost:${PORT}`);
+//       connectDB();
+//     });
+//   });
+// }
