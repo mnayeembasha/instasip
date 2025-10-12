@@ -10,6 +10,6 @@ export const connectDB = async (): Promise<void> => {
          isConnected = true;
     } catch (error) {
         console.error(`Database connection error: ${error}`);
-        process.exit(1);
+        throw error;
     }
 };
