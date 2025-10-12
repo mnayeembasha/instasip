@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js (must match Lambda runtime)
+      # 2️⃣ Setup Node.js (matches Lambda runtime)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -30,17 +30,18 @@ jobs:
         working-directory: ./server
         run: npm run build
 
-      # 5️⃣ Zip only dist + node_modules (exclude TS and git files)
+      # 5️⃣ Prepare deployment zip (dist + node_modules at root)
       - name: Zip deployment package
         working-directory: ./server
         run: |
           rm -f ../function.zip
-          # Zip compiled JS
-          cd dist
-          zip -r ../../function.zip . -x "*.ts" "*.map"
+          mkdir -p deploy_temp
+          cp -r dist/* deploy_temp/
+          cp -r node_modules deploy_temp/
+          cd deploy_temp
+          zip -r ../../function.zip .
           cd ..
-          # Include runtime dependencies
-          zip -r ../../function.zip node_modules -x "aws-sdk/*" "*.bin/*"
+          rm -rf deploy_temp
 
       # 6️⃣ Deploy to Lambda
       - name: Deploy to AWS Lambda
