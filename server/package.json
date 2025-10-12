@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "Instasip",
   "main": "index.ts",
-  "type": "module",
+  "type": "commonjs",
   "private": true,
   "peerDependencies": {
     "typescript": "^5"
   },
   "scripts": {
-    "build": "bun x tsc",
-    "start": "bun run dist/index.js",
-    "dev": "bun run build && bun run start"
+    "build": "tsc -b",
+    "start": "node dist/index.js",
+    "dev": "npm run build && npm run start"
   },
   "dependencies": {
     "axios": "^1.5.0",
@@ -25,6 +25,7 @@
     "mongoose": "^7.5.0",
     "path": "^0.12.7",
     "razorpay": "^2.9.6",
+    "serverless-http": "^4.0.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 import express from "express";
-import { PORT, NODE_ENV } from "./config"; // Ensure NODE_ENV is defined
+import { PORT, NODE_ENV } from "./config";
+import serverless from "serverless-http";
 import cors from "cors";
 import { type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
@@ -11,7 +12,6 @@ import cartRoutes from "./routes/cart.routes";
 import paymentRoutes from "./routes/payment.routes";
 import path from "path";
 
-const __dirname = path.resolve();
 const app = express();
 
 app.use(
@@ -19,14 +19,8 @@ app.use(
   express.raw({ type: 'application/json' })
 );
 
-// ✅ Dynamic CORS based on environment
 const allowedOrigin = NODE_ENV==="development"?"http://localhost:5173":['https://instasip.in','https://www.instasip.in'];
 
-// app.use(cors({
-//   origin: allowedOrigin,
-//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//   credentials: true
-// }));
 
 app.use((req, res, next) => {
   // Skip CORS for webhook route since Razorpay doesn't send Origin header
@@ -34,7 +28,6 @@ app.use((req, res, next) => {
     return next();
   }
 
-  // Apply CORS for all other routes
   cors({
     origin: allowedOrigin,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -55,15 +48,6 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 
 
-// ❌ Frontend serving logic commented out
-// if (NODE_ENV === "production") {
-//     app.use(express.static(path.join(__dirname, "../client/dist")));
-//     app.get("*", (req: Request, res: Response) => {
-//         res.sendFile(path.join(__dirname, "../client", "dist", "index.html"));
-//     });
-// }
-
-// Error handling
 app.use((err: any, req: Request, res: Response, next: any) => {
     console.error("Unhandled error:", err);
     res.status(500).json({ message: "Internal Server Error" });
@@ -73,8 +57,9 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Page Not Found" });
 });
 
-// Start server & connect DB
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    connectDB();
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+//     connectDB();
+// });
+connectDB();
+export const handler = serverless(app);
