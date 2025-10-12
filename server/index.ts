@@ -4,7 +4,6 @@ import serverless from "serverless-http";
 import cors from "cors";
 import { type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
-// import { connectDB } from "./lib/db";
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
 import orderRoutes from "./routes/order.routes";
@@ -22,10 +21,12 @@ app.use(
 
 const allowedOrigin = NODE_ENV==="development"?"http://localhost:5173":['https://instasip.in','https://www.instasip.in'];
 
+const stagePrefix = '/prod'; // can also use process.env.API_STAGE
+const routerPrefix = `${stagePrefix}/api`;
 
 app.use((req, res, next) => {
   // Skip CORS for webhook route since Razorpay doesn't send Origin header
-  if (req.path === '/api/payment/webhook') {
+  if (req.path === `${routerPrefix}/payment/webhook`) {
     return next();
   }
 
@@ -42,15 +43,16 @@ app.use(express.json({ limit: '7mb' }));
 app.use(express.urlencoded({ extended: true, limit: '7mb' }));
 app.use(cookieParser());
 
-app.get("/prod/api/health",(req:Request,res:Response)=>{
-  res.status(200).json({status:"OK",message:"Hello from Instasip API"});
+app.get(`${routerPrefix}/health`, (req: Request, res: Response) => {
+    res.status(200).json({ status: "OK", message: "Hello from Instasip API" });
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use('/api/cart', cartRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/payment", paymentRoutes);
+// Use the same prefix for other routes
+app.use(`${routerPrefix}/auth`, authRoutes);
+app.use(`${routerPrefix}/products`, productRoutes);
+app.use(`${routerPrefix}/cart`, cartRoutes);
+app.use(`${routerPrefix}/orders`, orderRoutes);
+app.use(`${routerPrefix}/payment`, paymentRoutes);
 
 
 app.use((err: any, req: Request, res: Response, next: any) => {
