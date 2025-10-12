@@ -10,34 +10,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Setup Node.js (must match Lambda runtime)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+      # 3️⃣ Install dependencies in server folder
       - name: Install dependencies
         working-directory: ./server
         run: npm ci
 
+      # 4️⃣ Build TypeScript project
       - name: Build project
         working-directory: ./server
         run: npm run build
 
+      # 5️⃣ Zip only dist + node_modules (exclude TS and git files)
       - name: Zip deployment package
         working-directory: ./server
         run: |
-          # Remove old zip if exists
           rm -f ../function.zip
           # Zip compiled JS
           cd dist
-          zip -r ../../function.zip . 
+          zip -r ../../function.zip . -x "*.ts" "*.map"
           cd ..
-          # Include node_modules
-          zip -r ../../function.zip node_modules
+          # Include runtime dependencies
+          zip -r ../../function.zip node_modules -x "aws-sdk/*" "*.bin/*"
 
+      # 6️⃣ Deploy to Lambda
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@v0.1.9
         with:
