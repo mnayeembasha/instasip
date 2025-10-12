@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prerender":"bun run prerender.js"
+    "prerender": "bun run prerender.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -25,6 +25,7 @@
     "class-variance-authority": "^latest",
     "clsx": "^latest",
     "lucide-react": "^latest",
+    "posthog-js": "^1.275.1",
     "react": "^18",
     "react-dom": "^18",
     "react-helmet-async": "^2.0.5",
