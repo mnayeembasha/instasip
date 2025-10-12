@@ -4,7 +4,7 @@ import serverless from "serverless-http";
 import cors from "cors";
 import { type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
-import { connectDB } from "./lib/db";
+// import { connectDB } from "./lib/db";
 import authRoutes from "./routes/auth.routes";
 import productRoutes from "./routes/product.routes";
 import orderRoutes from "./routes/order.routes";
@@ -13,6 +13,7 @@ import paymentRoutes from "./routes/payment.routes";
 import path from "path";
 
 const app = express();
+console.log("✅ Initializing Express app (Lambda cold start)");
 
 app.use(
   '/api/payment/webhook',
@@ -66,7 +67,7 @@ app.use((req: Request, res: Response) => {
 //     console.log(`Server is running on http://localhost:${PORT}`);
 //     connectDB();
 // });
-connectDB();
+// connectDB();
 export default app;
 
 // if (process.env.NODE_DEPLOY !== "lambda") {
