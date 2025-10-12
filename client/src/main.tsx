@@ -1,22 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
-import { PostHogProvider } from 'posthog-js/react'
+import { PostHogProvider } from 'posthog-js/react';
+import posthog from 'posthog-js';
 import App from './App';
 import './index.css';
 
-const options = {
+posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-  defaults: '2025-05-24',
-}
+  // You can also add other options like:
+  capture_pageview: true,
+  person_profiles: 'identified_only',
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-   <PostHogProvider apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_KEY} options={options}>
-    <HelmetProvider>
-      <App />
-    </HelmetProvider>
-   </PostHogProvider>
+    <PostHogProvider client={posthog}>
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
+    </PostHogProvider>
   </React.StrictMode>
 );
-
