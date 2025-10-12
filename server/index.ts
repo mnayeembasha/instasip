@@ -20,10 +20,7 @@ app.use(
 );
 
 // ✅ Dynamic CORS based on environment
-const allowedOrigin =
-  NODE_ENV === "development"
-    ? "http://localhost:5173"
-    : "https://instasip.vercel.app";
+const allowedOrigin = NODE_ENV==="development"?"http://localhost:5173":['https://instasip.in','https://www.instasip.in'];
 
 // app.use(cors({
 //   origin: allowedOrigin,
