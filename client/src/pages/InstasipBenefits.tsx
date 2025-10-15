@@ -1,5 +1,4 @@
-import React from 'react';
-import { IconLeaf, IconShieldCheck, IconClock, IconRecycle, IconBriefcase, IconHeart, IconEye, IconBone, IconBrain, IconActivity, IconBan, IconDroplet, IconWeight, IconDental, IconCup, IconFlame, IconSparkles, IconTrendingDown } from '@tabler/icons-react';
+import { IconLeaf, IconShieldCheck, IconClock, IconRecycle, IconBriefcase, IconHeart, IconEye, IconBone, IconBrain, IconActivity, IconDroplet, IconWeight, IconDental, IconCup, IconFlame, IconSparkles } from '@tabler/icons-react';
 import {Link} from "react-router-dom";
 
 const InstasipBenefits = () => {

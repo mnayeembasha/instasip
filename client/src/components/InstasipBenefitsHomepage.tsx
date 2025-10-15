@@ -1,6 +1,17 @@
-import React from 'react';
-import { IconCup, IconLeaf, IconDroplet, IconRecycle, IconBolt, IconArrowRight, IconSparkles } from '@tabler/icons-react';
+import { IconCup, IconLeaf, IconDroplet, IconRecycle, IconBolt, IconArrowRight } from '@tabler/icons-react';
 import {Link} from "react-router-dom";
+import {type TablerIcon } from '@tabler/icons-react';
+
+interface Benefit{
+  icon:TablerIcon;
+  heading:string;
+  tagline:string;
+  gradient:string;
+  position:string;
+}
+interface BenefitCardProps{
+  benefit:Benefit
+}
 const InstasipBenefitsHomepage = () => {
   const benefits = [
     {
@@ -40,7 +51,7 @@ const InstasipBenefitsHomepage = () => {
     }
   ];
 
-  const BenefitCard = ({ benefit }) => {
+  const BenefitCard = ({ benefit }:BenefitCardProps) => {
     const Icon = benefit.icon;
     return (
       <div className="bg-white rounded-2xl p-5 w-96 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
