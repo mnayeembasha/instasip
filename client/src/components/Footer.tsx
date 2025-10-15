@@ -6,28 +6,28 @@ const Footer: React.FC = () => {
     <footer id="contact" className="bg-secondary text-white pt-12 pb-8">
       <div className="container mx-auto px-4 grid md:grid-cols-4 gap-8">
         <div>
-          <h3 className="text-xl font-bold mb-4">Insta-Sip</h3>
-          <p>Revolutionizing tea, one sip at a time.</p>
+          <h3 className="text-xl tracking-tighter mb-4">Insta-Sip</h3>
+          <p className="text-gray-200">Revolutionizing tea, one sip at a time.</p>
         </div>
         <div>
-          <h4 className="font-semibold mb-4">Products</h4>
-          <ul className="space-y-2">
+          <h4 className="text-xl tracking-tighter mb-4">Products</h4>
+          <ul className="space-y-2 text-gray-200">
             <li><a href="#" className="hover:text-primary">Pre-Mix</a></li>
             <li><a href="#" className="hover:text-primary">Green Tea</a></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-semibold mb-4">Support</h4>
-          <ul className="space-y-2">
+          <h4 className="text-xl tracking-tighter mb-4">Support</h4>
+          <ul className="space-y-2 text-gray-200">
             <li><a href="#" className="hover:text-primary">Terms of Service</a></li>
             <li><a href="#" className="hover:text-primary">Privacy Policy</a></li>
             <li><a href="#" className="hover:text-primary">FAQ</a></li>
           </ul>
         </div>
-        <div className="p-6">
-      <h4 className="font-semibold mb-4 text-lg">Contact</h4>
+        <div className="">
+      <h4 className="text-xl tracking-tighter mb-4 text-lg">Contact</h4>
 
-      <div className="space-y-3">
+      <div className="space-y-3 text-gray-200">
          <div className="space-y-4">
       {/* Phone */}
       <a href="tel:8074581961" className="flex items-center gap-3 hover:text-primary transition">

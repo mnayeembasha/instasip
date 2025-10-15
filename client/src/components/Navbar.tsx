@@ -64,7 +64,7 @@ const Navbar = () => {
     >
       <div className="max-w-5xl 2xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="bg-white/60 backdrop-blur-md shadow-lg rounded-4xl border border-gray-200">
-          <div className="flex justify-between h-16 lg:h-14 2xl:h-16 items-center px-4 sm:px-6">
+          <div className="flex justify-between h-16 lg:h-14 2xl:h-16 items-center px-4 md:px-3">
             {/* Logo and Brand */}
             <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
               <div className="w-9 h-9">
@@ -74,7 +74,7 @@ const Navbar = () => {
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <span className="font-archivo text-primary font-bold hover:opacity-80 transition text-xl sm:text-2xl tracking-tighter">
+              <span className="text-primary font-bold hover:opacity-80 transition text-2xl md:text-2xl tracking-tighter ">
                 InstaSip
               </span>
             </Link>

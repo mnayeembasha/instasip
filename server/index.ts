@@ -10,9 +10,9 @@ import orderRoutes from "./routes/order.routes";
 import cartRoutes from "./routes/cart.routes";
 import paymentRoutes from "./routes/payment.routes";
 import path from "path";
+import {connectDB} from "./lib/db";
 
 const app = express();
-console.log("✅ Initializing Express app (Lambda cold start)");
 
 app.use(
   '/api/payment/webhook',
@@ -68,12 +68,12 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Page Not Found" });
 });
 
-// app.listen(PORT, () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-//     connectDB();
-// });
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    connectDB();
+});
 // connectDB();
-export default app;
+// export default app;
 
 // if (process.env.NODE_DEPLOY !== "lambda") {
 //   const PORT = process.env.PORT;

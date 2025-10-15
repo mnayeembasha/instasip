@@ -9,6 +9,7 @@ import {
   getPaymentStats
 } from "../controllers/payment.controller";
 import { handleRazorpayWebhook, testUserLookup, testWebhook } from "../controllers/razorpay-webhook.controller";
+import { paymentRateLimiter } from "../middleware/rateLimiter";
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ const router = express.Router();
 router.post("/webhook", handleRazorpayWebhook);
 
 // User routes
-router.post("/create-order", authMiddleware, createRazorpayOrder);
+router.post("/create-order", paymentRateLimiter,authMiddleware, createRazorpayOrder);
 router.post("/verify", authMiddleware, verifyPayment);
 
 // Admin routes

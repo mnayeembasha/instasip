@@ -4,9 +4,9 @@ const WhyChooseUs: React.FC = () => {
   return (
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 max-w-5xl text-center">
-        <h2 className="text-4xl font-bold mb-12 text-primary">Why Choose InstaSip?</h2>
+        <h2 className="text-4xl md:text-5xl lg:text-6xl md:font-bold tracking-tighter mb-6 md:mb-12 text-primary">Why Choose InstaSip?</h2>
         <p className="text-lg mb-16 text-gray-700 text-left md:text-center">
-          We chose Insta-Sip because it solves a real problem in today’s fast-paced lifestyle—people love tea but don’t always have the time or setup to brew it properly.
+          We chose Insta-Sip because it solves a real problem in today’s fast-paced lifestyle - people love tea but don't always have the time or setup to brew it properly.
           With our ready-to-use, eco-friendly tea cups, we bring together convenience, health, and taste in one product.
         </p>
 
@@ -20,8 +20,8 @@ const WhyChooseUs: React.FC = () => {
             />
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/70 bg-opacity-40 flex flex-col justify-end items-center px-6 py-8">
-              <h3 className="text-2xl font-semibold mb-2 text-white">Innovative & Convenient</h3>
-              <p className="text-white text-center">Trendy, marketable, affordable & scalable.</p>
+              <h3 className="text-2xl tracking-tighter mb-2 text-white">Innovative & Convenient</h3>
+              <p className="text-gray-300 text-center">Trendy, marketable, affordable & scalable.</p>
             </div>
           </div>
 
@@ -34,8 +34,8 @@ const WhyChooseUs: React.FC = () => {
             />
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/70 bg-opacity-40 flex flex-col justify-end items-center px-6 py-8">
-              <h3 className="text-2xl font-semibold mb-2 text-white">Sustainable Choice</h3>
-              <p className="text-white text-center">Blends tradition with innovation for a lifestyle brand.</p>
+              <h3 className="text-2xl tracking-tighter mb-2 text-white">Sustainable Choice</h3>
+              <p className="text-gray-300 text-center">Blends tradition with innovation for a lifestyle brand.</p>
             </div>
           </div>
         </div>

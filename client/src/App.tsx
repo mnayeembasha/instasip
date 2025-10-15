@@ -20,6 +20,7 @@ import { getMe } from "./store/features/authSlice";
 import LoadingSpinner from "./components/LoadingSpinner";
 import SEOManager from "./components/SEOManager";
 import { fetchCart } from "./store/features/cartSlice";
+import InstasipBenefits from "./pages/InstasipBenefits";
 
 const AppContent = () => {
   const dispatch = useAppDispatch();
@@ -55,6 +56,7 @@ const AppContent = () => {
         <Route path="/products" element={<Products />} />
         <Route path="/products/:slug" element={<ProductDetails />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/benefits" element={<InstasipBenefits />} />
         <Route path="/contact" element={<Contact />} />
 
         {/* Protected routes */}

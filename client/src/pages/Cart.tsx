@@ -25,16 +25,18 @@ const addressSchema = z.object({
 });
 
 const Cart = () => {
-  const { items, isFetchingCart, isUpdatingCart, isRemovingFromCart, error: cartError } = useAppSelector((state) => state.cart);
+  const { items, isFetchingCart, isUpdatingCart, error: cartError } = useAppSelector((state) => state.cart);
   const { user: currentUser, isCheckingAuth } = useAppSelector((state) => state.auth);
   const { isCreatingOrder, error: orderError } = useAppSelector((state) => state.order);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [removingItems, setRemovingItems] = useState<{ [key: string]: boolean }>({});
+  const [isFetchingZipCode, setIsFetchingZipCode] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(addressSchema),
-    defaultValues: { street: '', city: '', state: '', zipCode: '', country: 'India' },
+    defaultValues: { street: '', zipCode: '', city: '', state: '', country: 'India' },
   });
 
   useEffect(() => {
@@ -65,25 +67,56 @@ const Cart = () => {
   const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   const handleQuantityChange = async (productId: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1) {
+      toast.error('Quantity must be at least 1');
+      return;
+    }
+
+    const item = items.find((i) => i.product._id === productId);
+    if (item && newQuantity > item.product.stock) {
+      toast.error(`Quantity cannot exceed available stock (${item.product.stock})`);
+      return;
+    }
 
     try {
       await dispatch(updateCartItemQuantity({ productId, quantity: newQuantity })).unwrap();
       toast.success('Quantity updated');
     } catch (error: unknown) {
       if (error instanceof Error) {
-        toast.error(error.message || "Failed to update quantity");
+        toast.error(error.message || 'Failed to update quantity');
       }
     }
   };
 
   const handleRemoveItem = async (productId: string) => {
     try {
+      setRemovingItems((prev) => ({ ...prev, [productId]: true }));
       await dispatch(removeFromCart(productId)).unwrap();
       toast.success('Item removed from cart');
     } catch (error: unknown) {
       if (error instanceof Error) {
-        toast.error(error.message || "Failed to remove item");
+        toast.error(error.message || 'Failed to remove item');
+      }
+    } finally {
+      setRemovingItems((prev) => ({ ...prev, [productId]: false }));
+    }
+  };
+
+  const handleZipCodeChange = async (zipCode: string) => {
+    if (zipCode.length === 6 && /^\d{6}$/.test(zipCode)) {
+      setIsFetchingZipCode(true);
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${zipCode}`);
+        const data = await response.json();
+        if (data[0]?.Status === 'Success' && data[0]?.PostOffice?.length > 0) {
+          const { Block, State } = data[0].PostOffice[0];
+          form.setValue('city', Block);
+          form.setValue('state', State);
+        }
+      } catch (error) {
+        // Do nothing if API fails, let user fill manually
+      } finally {
+        setIsFetchingZipCode(false);
       }
     }
   };
@@ -120,7 +153,7 @@ const Cart = () => {
           try {
             // Create order after successful payment
             await dispatch(createOrder({
-              items: items.map(i => ({ product: i.product._id, quantity: i.quantity })),
+              items: items.map((i) => ({ product: i.product._id, quantity: i.quantity })),
               shippingAddress: data,
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
@@ -132,7 +165,7 @@ const Cart = () => {
             navigate('/profile');
           } catch (error) {
             if (error instanceof Error) {
-              toast.error(error.message || "Failed to place order");
+              toast.error(error.message || 'Failed to place order');
             }
           }
         },
@@ -157,7 +190,7 @@ const Cart = () => {
     } catch (error) {
       setIsProcessingPayment(false);
       if (error instanceof Error) {
-        toast.error(error.message || "Failed to initiate payment");
+        toast.error(error.message || 'Failed to initiate payment');
       }
     }
   };
@@ -191,7 +224,7 @@ const Cart = () => {
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="lg:col-span-2 space-y-4 md:space-y-6">
-              {items.map(item => (
+              {items.map((item) => (
                 <Card key={item.product._id} className="overflow-hidden">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center p-4 gap-4">
                     <img
@@ -207,23 +240,37 @@ const Cart = () => {
                         Subtotal: &#8377;{(item.product.price * item.quantity).toFixed(2)}
                       </p>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <Input
-                          type="number"
-                          min={1}
-                          max={item.product.stock}
-                          value={item.quantity}
-                          onChange={(e) => handleQuantityChange(item.product._id, parseInt(e.target.value) || 1)}
-                          disabled={isUpdatingCart}
-                          className="w-full sm:w-20"
-                        />
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(item.product._id, item.quantity - 1)}
+                            disabled={isUpdatingCart || item.quantity <= 1}
+                            className="w-8 h-8"
+                          >
+                            −
+                          </Button>
+                          <span className="w-12 text-center border border-gray-300 rounded-lg py-1.5">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
+                            disabled={isUpdatingCart || item.quantity >= item.product.stock}
+                            className="w-8 h-8"
+                          >
+                            +
+                          </Button>
+                        </div>
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => handleRemoveItem(item.product._id)}
-                          disabled={isRemovingFromCart}
+                          disabled={removingItems[item.product._id] || false}
                           className="w-full sm:w-auto"
                         >
-                          {isRemovingFromCart ? 'Removing...' : 'Remove'}
+                          {removingItems[item.product._id] ? 'Removing...' : 'Remove'}
                         </Button>
                       </div>
                     </div>
@@ -261,34 +308,67 @@ const Cart = () => {
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleProceedToCheckout)} className="space-y-4 w-full">
                       <div className="text-sm font-semibold mb-2">Shipping Address</div>
-                      <FormField name="street" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Street</FormLabel>
-                          <FormControl><Input {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField name="city" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl><Input {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField name="state" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State</FormLabel>
-                          <FormControl><Input {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField name="zipCode" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Zip Code</FormLabel>
-                          <FormControl><Input {...field} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
+                      <FormField
+                        name="street"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="zipCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Zip Code</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  {...field}
+                                  onChange={(e) => {
+                                    field.onChange(e);
+                                    handleZipCodeChange(e.target.value);
+                                  }}
+                                />
+                                {isFetchingZipCode && (
+                                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                                    <LoadingSpinner />
+                                  </div>
+                                )}
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        name="state"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       <Button
                         type="submit"
                         disabled={isCreatingOrder || isProcessingPayment || items.length === 0}

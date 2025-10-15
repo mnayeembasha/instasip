@@ -9,7 +9,7 @@ export const getProducts = async (req: Request, res: Response) => {
     try {
         const { category, search, sortBy, price } = req.query;
 
-        const filter: any = { isActive: true };
+        const filter: any = { isActive: true }; 
 
         if (category && category !== "all") {
             filter.category = category;
@@ -28,7 +28,6 @@ export const getProducts = async (req: Request, res: Response) => {
             sortOption = { createdAt: 1 };
         }
 
-        // Add price sorting
         if (price === "lowtohigh") {
             sortOption = { price: 1 };
         } else if (price === "hightolow") {
@@ -36,7 +35,7 @@ export const getProducts = async (req: Request, res: Response) => {
         }
 
         const products = await Product.find(filter).sort(sortOption);
-        if(!products){
+        if(!products || products.length === 0){
             return res.status(200).json({message:"No Products found with applied filters"});
         }else{
             return res.status(200).json({
@@ -99,6 +98,11 @@ export const createProduct = async (req: Request, res: Response) => {
         let imagePublicId = "";
 
         if (image && image.startsWith('data:image/')) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            const mimeType = image.split(';')[0].split(':')[1];
+            if (!allowedTypes.includes(mimeType)) {
+              return res.status(400).json({ message: 'Invalid image format' });
+            }
             const base64Data = image.split(';base64,').pop() || '';
             const buffer = Buffer.from(base64Data, 'base64');
 
@@ -155,6 +159,11 @@ export const updateProduct = async (req: Request, res: Response) => {
         };
 
         if (image && image.startsWith('data:image/')) {
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+            const mimeType = image.split(';')[0].split(':')[1];
+            if (!allowedTypes.includes(mimeType)) {
+              return res.status(400).json({ message: 'Invalid image format' });
+            }
             const base64Data = image.split(';base64,').pop() || '';
             const buffer = Buffer.from(base64Data, 'base64');
 

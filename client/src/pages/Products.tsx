@@ -39,8 +39,8 @@ const Products = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         {/* Header Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight text-primary">
+        <div className="text-center mb-8 md:mt-5">
+          <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold mb-3 tracking-tighter text-primary">
             Our Products
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">

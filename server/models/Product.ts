@@ -71,9 +71,6 @@ const productSchema = new mongoose.Schema<ProductDocument>(
 
 productSchema.pre("save", async function (next) {
   if (this.isNew && !this.slug) {
-    // const shortId = this._id.toString().slice(-6);
-    // this.slug = generateSlug(this.name, shortId);
-
     const baseSlug = sluggify(this.name);
     let slug = baseSlug;
 
@@ -107,7 +104,4 @@ productSchema.pre("save", async function (next) {
   }
   next();
 });
-export const Product = mongoose.model<ProductDocument>(
-  "Product",
-  productSchema
-);
+export const Product = mongoose.model<ProductDocument>("Product",productSchema);

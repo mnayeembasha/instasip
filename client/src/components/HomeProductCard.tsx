@@ -1,12 +1,14 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 
 interface HomeProductCardProps {
   name: string;
   price: string;
   image: string;
+  link:string;
 }
 
-const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, price, image }) => {
+const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, price, image,link }) => {
   return (
     <div className="relative rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in-up">
       {/* Product Image */}
@@ -17,17 +19,17 @@ const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, price, image })
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-        <h3 className="text-lg font-semibold mb-1">{name}</h3>
+        <h3 className="text-lg tracking-tight mb-1">{name}</h3>
         <p className="text-xl font-bold mb-3" style={{ color: "#E7A873" }}>
           {price}
         </p>
-        <a href="/products">
+        <Link to={link}>
           <button
             className="w-full py-2 bg-gray-200/20 text-white rounded-full transition-colors cursor-pointer"
           >
             Buy Now
           </button>
-        </a>
+        </Link>
       </div>
     </div>
   );

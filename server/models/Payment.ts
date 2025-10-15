@@ -92,7 +92,7 @@ const paymentSchema = new mongoose.Schema<PaymentDocument>({
 
 // Indexes for faster queries
 paymentSchema.index({ user: 1, createdAt: -1 });
-paymentSchema.index({ razorpayOrderId: 1 });
+paymentSchema.index({ razorpayOrderId: 1, user: 1 }, { unique: true });
 paymentSchema.index({ razorpayPaymentId: 1 });
 paymentSchema.index({ status: 1 });
 

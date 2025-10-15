@@ -51,12 +51,13 @@ const userSchema = new mongoose.Schema<UserDocument>({
     timestamps: true
 });
 
+userSchema.index({ phone: 1 });
+
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
 
     try {
-        const salt = await bcrypt.genSalt(12);
-        this.password = await bcrypt.hash(this.password, salt);
+        this.password = await bcrypt.hash(this.password, 12);
         next();
     } catch (error: any) {
         next(error);

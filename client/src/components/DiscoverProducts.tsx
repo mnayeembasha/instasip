@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import HomeProductCard from './HomeProductCard';
 
 const preMixProducts = [
-  { name: 'Masala Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487448/instasip/lkjopeknfhhx3vfce6ap.jpg' },
-  { name: 'Coffee', price: '₹25', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487431/instasip/n67g3hlumuutxtrq96hw.jpg' },
-  { name: 'Lemon Tea', price: '₹18', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487405/instasip/i7vacfkhpncjmibufu5l.jpg' }
+  { name: 'Masala Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487448/instasip/lkjopeknfhhx3vfce6ap.jpg',link:"/products/masala-tea" },
+  { name: 'Coffee', price: '₹25', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487431/instasip/n67g3hlumuutxtrq96hw.jpg',link:"/products/coffee" },
+  { name: 'Lemon Tea', price: '₹18', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487405/instasip/i7vacfkhpncjmibufu5l.jpg',link:"/products/lemon-tea" }
 ];
 
 const greenTeaProducts = [
-  { name: 'Pomegranate Flavoured Green Tea', price: '₹22', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487382/instasip/ddwxuzan8zph3efgqccj.jpg' },
-  { name: 'Mint Flavoured Green Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487351/instasip/n5cqakcr6z0tsqrew4nk.jpg' },
-  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹24', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487329/instasip/v0seuojdg54ss0x7i0mm.jpg' }
+  { name: 'Pomegranate Flavoured Green Tea', price: '₹22', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536304/instasip/fjdz2k2irdp2jgvw4uco.jpg',link:"/products/pomegranate-flavoured-green-tea" },
+  { name: 'Mint Flavoured Green Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536282/instasip/tmt6iezplgclvbxi8ot0.png',link:"/products/mint-flavoured-green-tea" },
+  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹24', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536260/instasip/hi0hbv8o0dx9azlvwebh.png',link:"/products/ginger-lemon-flavoured-green-tea" }
 ];
 
 // Combine products for "All"
-const allProducts = [...preMixProducts, ...greenTeaProducts];
+const allProducts = [ ...greenTeaProducts,...preMixProducts];
 
 const DiscoverProducts: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'premix' | 'greentea'>('all');
@@ -37,16 +37,16 @@ const DiscoverProducts: React.FC = () => {
   return (
     <section id="products" className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-12 text-primary">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl text-center mb-6 text-primary tracking-tighter md:font-bold">
           Discover Our Products
         </h2>
 
         {/* Tabs */}
         <div className="flex justify-center mb-12">
-          <div className="flex bg-secondary/10 rounded-full p-1">
+          <div className="flex bg-secondary/10 rounded-full p-1 tracking-tighter">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-6 py-2 rounded-full font-semibold transition-all duration-300
+              className={`px-6 py-2 rounded-full  transition-all duration-300
                 ${activeTab === 'all'
                   ? 'bg-primary text-white shadow-md'
                   : 'text-accent hover:bg-primary/10 hover:text-primary'
@@ -56,7 +56,7 @@ const DiscoverProducts: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('premix')}
-              className={`px-6 py-2 rounded-full font-semibold transition-all duration-300
+              className={`px-6 py-2 rounded-full transition-all duration-300 tracking-tighter
                 ${activeTab === 'premix'
                   ? 'bg-primary text-white shadow-md'
                   : 'text-accent hover:bg-primary/10 hover:text-primary'
@@ -66,7 +66,7 @@ const DiscoverProducts: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('greentea')}
-              className={`px-6 py-2 rounded-full font-semibold transition-all duration-300
+              className={`px-6 py-2 rounded-full transition-all duration-300 tracking-tighter
                 ${activeTab === 'greentea'
                   ? 'bg-primary text-white shadow-md'
                   : 'text-accent hover:bg-primary/10 hover:text-primary'

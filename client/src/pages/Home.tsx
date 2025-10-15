@@ -8,6 +8,7 @@ import WhyChooseUs from '@/components/WhyChooseUs';
 // import HowToUsePreMix from '@/components/HowToUsePreMix';
 // import HowToUseGreenTea from '@/components/HowToUseGreenTea';
 import Benefits from '@/components/Benefits';
+import InstasipBenefitsHomepage from "@/components/InstasipBenefitsHomepage";
 import SustainablePackaging from '@/components/SustainablePackaging';
 import Footer from '@/components/Footer';
 import WhatsAppIcon from '@/components/WhatsappIcon';
@@ -18,9 +19,10 @@ const App: React.FC = () => {
   return (
 
 
-      <div className="min-h-screen bg-background text-gray-800 pb-15">
+      <div className="min-h-screen bg-background text-gray-800 pb-15 md:pb-0">
       <main>
         <Hero />
+        <InstasipBenefitsHomepage/>
         <DiscoverProducts />
         <AboutProduct />
         <UnleashCreativity />

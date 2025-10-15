@@ -4,17 +4,15 @@ export const registerZodSchema = z.object({
     name: z.string({ message: "Name is required" })
            .min(2, "Name should contain at least 2 characters")
            .max(50, "Name should not exceed 50 characters"),
-    phone: z.string({ message: "Phone is required" })
-            .length(10, "Phone number should contain 10 digits")
-            .regex(/^[+]?[\d\s-()]+$/, "Invalid phone number format"),
+    phone: z.string({message:"Phone Number is required"})
+            .regex(/^\d{10}$/, "Phone Number must be exactly 10 digits"),
     password: z.string({ message: "Password is required" })
                .min(6, "Password should contain at least 6 characters"),
 });
 
 export const loginZodSchema = z.object({
-    phone: z.string({ message: "Phone is required" })
-            .length(10, "Phone number should contain 10 digits")
-            .regex(/^[+]?[\d\s-()]+$/, "Invalid phone number format"),
+    phone: z.string({message:"Phone Number is required"})
+            .regex(/^\d{10}$/, "Phone Number must be exactly 10 digits"),
     password: z.string({ message: "Password is required" })
         .min(6, "Password should contain at least 6 characters"),
 });
@@ -42,11 +40,31 @@ export const orderCreateZodSchema = z.object({
             .min(1, "Quantity should be at least 1"),
     })).min(1, "At least one item is required"),
     shippingAddress: z.object({
-        street: z.string({ message: "Street address is required" }),
-        city: z.string({ message: "City is required" }),
-        state: z.string({ message: "State is required" }),
-        zipCode: z.string({ message: "Zip code is required" }),
-        country: z.string().optional(),
+        street: z.string({ message: "Street address is required" })
+            .trim()
+            .min(10, "Street address must be at least 10 characters")
+            .max(200, "Street address cannot exceed 200 characters"),
+            // .regex(/^[a-zA-Z0-9\s,.\-#/]+$/, "Street address contains invalid characters"),
+        
+        city: z.string({ message: "City is required" })
+            .trim()
+            .min(2, "City name must be at least 2 characters")
+            .max(100, "City name cannot exceed 100 characters")
+            .regex(/^[a-zA-Z\s]+$/, "City name should contain only letters"),
+        
+        state: z.string({ message: "State is required" })
+            .trim()
+            .min(2, "State name must be at least 2 characters")
+            .max(100, "State name cannot exceed 100 characters")
+            .regex(/^[a-zA-Z\s]+$/, "State name should contain only letters"),
+        
+        zipCode: z.string({ message: "ZIP/PIN code is required" })
+            .trim()
+            .regex(/^[1-9][0-9]{5}$/, "Invalid PIN code. Must be 6 digits and cannot start with 0"),
+        
+        country: z.string()
+            .default("India")
+            .optional()
     }),
     razorpayOrderId: z.string({ message: "Payment order ID is required" }),
     razorpayPaymentId: z.string({ message: "Payment ID is required" }),

@@ -7,133 +7,174 @@ import { validateObjectId } from "../utils/validateObjectId";
 import { Cart } from "../models/Cart";
 import crypto from "crypto";
 import { RAZORPAY_KEY_SECRET } from "../config";
+import {razorpay} from "./payment.controller";
+
 
 const ID_ERROR_MESSAGE = 'Invalid Order ID';
 
-const validateAndPrepareItem = async (item: { product: string; quantity: number }, session: mongoose.ClientSession) => {
-    if (!mongoose.Types.ObjectId.isValid(item.product)) {
-        throw new Error(`Invalid product ID: ${item.product}`);
-    }
+export const validateAndPrepareItem = async (
+  item: { product: string; quantity: number },
+  session: mongoose.ClientSession
+) => {
+  if (!mongoose.Types.ObjectId.isValid(item.product)) {
+    throw new Error(`Invalid product ID: ${item.product}`);
+  }
 
-    const product = await Product.findById(item.product).session(session);
-    if (!product) throw new Error(`Product not found: ${item.product}`);
-    if (!product.isActive) throw new Error(`Product is not available: ${product.name}`);
-    if (product.stock < item.quantity) {
-        throw new Error(
-            `Insufficient stock for product: ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`
-        );
-    }
+  const updateResult = await Product.updateOne(
+    { _id: item.product, stock: { $gte: item.quantity }, isActive: true },
+    { $inc: { stock: -item.quantity } },
+    { session }
+  );
 
-    await Product.updateOne(
-        { _id: product._id },
-        { $inc: { stock: -item.quantity } },
-        { session }
+  if (updateResult.modifiedCount === 0) {
+    const freshProduct = await Product.findById(item.product).session(session);
+    if (!freshProduct) throw new Error(`Product no longer exists: ${item.product}`);
+    if (!freshProduct.isActive) throw new Error(`Product is not available: ${freshProduct.name}`);
+    throw new Error(
+      `Insufficient stock for product: ${freshProduct.name}. ` +
+      `Available: ${freshProduct.stock}, Requested: ${item.quantity}`
     );
+  }
 
-    return {
-        product: product._id,
-        quantity: item.quantity,
-        price: product.price,
-        total: product.price * item.quantity
-    };
+  const product = await Product.findById(item.product).session(session);
+  if (!product) throw new Error(`Product not found after stock update: ${item.product}`);
+
+  return {
+    product: product._id,
+    quantity: item.quantity,
+    price: product.price,
+    total: product.price * item.quantity
+  };
 };
 
-export const createOrder = async (req: Request, res: Response) => {
-    const { items, shippingAddress, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
-    const userId = req.user?._id;
 
-    // Verify payment signature
+export const createOrder = async (req: Request, res: Response) => {
+  const { items, shippingAddress, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+  const userId = req.user?._id;
+
+
+  // Check if payment already exists
+    const existingPayment = await Payment.findOne({ 
+        razorpayPaymentId 
+    });
+    
+    if (existingPayment) {
+        return res.status(400).json({ 
+            message: "Payment already processed",
+            orderId: existingPayment.order 
+        });
+    }
+
+  // Verify payment signature
+  try {
     const body = razorpayOrderId + "|" + razorpayPaymentId;
     const expectedSignature = crypto
-        .createHmac("sha256", RAZORPAY_KEY_SECRET!)
-        .update(body)
-        .digest("hex");
+      .createHmac("sha256", RAZORPAY_KEY_SECRET!)
+      .update(body)
+      .digest("hex");
 
-    if (expectedSignature !== razorpaySignature) {
-        // Save failed payment attempt
-        try {
-            await Payment.create({
-                user: userId,
-                razorpayOrderId,
-                razorpayPaymentId,
-                razorpaySignature,
-                amount: 0,
-                status: 'failed',
-                errorCode: 'SIGNATURE_MISMATCH',
-                errorDescription: 'Payment signature verification failed'
-            });
-        } catch (error) {
-            console.error("Error saving failed payment:", error);
-        }
-        return res.status(400).json({ message: "Payment verification failed. Please contact support." });
+    if (!crypto.timingSafeEqual(Buffer.from(expectedSignature, 'hex'), Buffer.from(razorpaySignature, 'hex'))) {
+      await Payment.create({ user: userId, razorpayOrderId, razorpayPaymentId, razorpaySignature, amount: 0, status: 'failed', errorCode: 'SIGNATURE_MISMATCH' });
+      return res.status(400).json({ message: "Payment verification failed" });
     }
+  } catch (err) {
+    console.error("Payment verification error:", err);
+    return res.status(400).json({ message: "Payment verification failed" });
+  }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
-    try {
-        let totalAmount = 0;
-        const orderItems = [];
-
-        // Process each item
+  //validate order amount matches razorpay
+  try {
+        const razorpayOrder = await razorpay.orders.fetch(razorpayOrderId);
+        
+        // Calculate expected total from products
+        let calculatedTotal = 0;
         for (const item of items) {
-            const preparedItem = await validateAndPrepareItem(item, session);
-            totalAmount += preparedItem.total;
-            orderItems.push(preparedItem);
+            const product = await Product.findById(item.product);
+            if (!product) {
+                throw new Error(`Product not found: ${item.product}`);
+            }
+            calculatedTotal += product.price * item.quantity;
         }
-
-        // Create order
-        const orderData = {
-            user: userId,
-            items: orderItems,
-            totalAmount,
-            shippingAddress,
-            status:'confirmed',
-            paymentStatus: 'paid',
-            razorpayOrderId,
-            razorpayPaymentId,
-            razorpaySignature
-        };
-        const [createdOrder] = await Order.create([orderData], { session });
-
-        if (!createdOrder) throw new Error("Failed to create order");
-
-        // Save payment record
-        await Payment.create([{
-            user: userId,
-            order: createdOrder._id,
-            razorpayOrderId,
-            razorpayPaymentId,
-            razorpaySignature,
-            amount: totalAmount,
-            currency: 'INR',
-            status: 'captured',
-            contact: req.user?.phone
-        }], { session });
-
-        // Clear user's cart after successful order
-        await Cart.findOneAndUpdate(
-            { user: userId },
-            { items: [] },
-            { session }
-        );
-
-        await session.commitTransaction();
-        session.endSession();
-
-        // Populate order for response
-        const populatedOrder = await Order.findById(createdOrder._id)
-            .populate("user", "-password")
-            .populate("items.product");
-
-        return res.status(201).json({ message: "Order placed successfully", order: populatedOrder });
-    } catch (error: unknown) {
-        await session.abortTransaction();
-        session.endSession();
-        console.error("Error in createOrder controller:", error);
-        const message = error instanceof Error ? error.message : "Internal Server Error";
-        res.status(400).json({ message });
+        
+        const razorpayAmount:number = Number(razorpayOrder.amount) / 100; // Convert paise to rupees
+        
+        if (Math.abs(calculatedTotal - razorpayAmount) > 0.01) { // Allow 1 paisa difference for rounding
+            throw new Error(
+                `Amount mismatch. Calculated: ₹${calculatedTotal}, Paid: ₹${razorpayAmount}`
+            );
+        }
+    } catch (error: any) {
+        console.error("Order amount validation failed:", error);
+        return res.status(400).json({ 
+            message: "Order validation failed. Please contact support.",
+            error: error.message 
+        });
     }
+
+
+  // Start MongoDB transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    let totalAmount = 0;
+    const orderItems = [];
+
+    // Process each item with transaction-safe stock deduction
+    for (const item of items) {
+      const preparedItem = await validateAndPrepareItem(item, session);
+      totalAmount += preparedItem.total;
+      orderItems.push(preparedItem);
+    }
+
+    // Create order
+    const [createdOrder] = await Order.create([{
+      user: userId,
+      items: orderItems,
+      totalAmount,
+      shippingAddress,
+      status: 'confirmed',
+      paymentStatus: 'paid',
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature
+    }], { session });
+
+    if (!createdOrder) throw new Error("Failed to create order");
+
+    // Save payment record
+    await Payment.create([{
+      user: userId,
+      order: createdOrder._id,
+      razorpayOrderId,
+      razorpayPaymentId,
+      razorpaySignature,
+      amount: totalAmount,
+      currency: 'INR',
+      status: 'captured',
+      contact: req.user?.phone
+    }], { session });
+
+    // Clear user's cart
+    await Cart.findOneAndUpdate({ user: userId }, { items: [] }, { session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    // Populate order for response
+    const populatedOrder = await Order.findById(createdOrder._id)
+      .populate("user", "-password")
+      .populate("items.product");
+
+    return res.status(201).json({ message: "Order placed successfully", order: populatedOrder });
+  } catch (error: unknown) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error in createOrder:", error);
+    const message = error instanceof Error ? error.message : "Internal Server Error";
+    res.status(400).json({ message });
+  }
 };
 
 export const getMyOrders = async (req: Request, res: Response) => {

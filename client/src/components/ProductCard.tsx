@@ -14,13 +14,11 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState('5'); // Store as string to allow free input
+  const [isAdding, setIsAdding] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-//  const location = useLocation();
-
-  const { user:currentUser } = useAppSelector((state) => state.auth);
-  const { isAddingToCart } = useAppSelector((state) => state.cart);
+  const { user: currentUser } = useAppSelector((state) => state.auth);
 
   const handleAddToCart = async () => {
     // Check if user is logged in
@@ -30,22 +28,31 @@ const ProductCard = ({ product }: ProductCardProps) => {
       return;
     }
 
-    if (quantity < 1 || quantity > product.stock) {
-      toast.error('Invalid quantity');
+    // Validate quantity
+    const parsedQuantity = parseInt(quantity, 10);
+    if (isNaN(parsedQuantity) || parsedQuantity < 1) {
+      toast.error('Please enter a valid quantity');
+      return;
+    }
+    if (parsedQuantity > product.stock) {
+      toast.error(`Quantity cannot exceed available stock (${product.stock})`);
       return;
     }
 
     try {
+      setIsAdding(true);
       await dispatch(addToCart({
         productId: product._id,
-        quantity
+        quantity: parsedQuantity
       })).unwrap();
       toast.success('Added to cart');
-      setQuantity(1); // Reset quantity after successful add
+      setQuantity('1'); // Reset to '1' as string after successful add
     } catch (error: unknown) {
-      if(error instanceof Error){
+      if (error instanceof Error) {
         toast.error(error.message || 'Failed to add to cart');
       }
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -79,20 +86,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
       {/* Footer Controls */}
       <CardFooter className="flex items-center gap-2 p-4">
         <Input
-          type="number"
-          min={1}
-          max={product.stock}
+          type="text" // Use text to allow free input
           value={quantity}
-          onChange={(e) => setQuantity(Number(e.target.value))}
+          onChange={(e) => setQuantity(e.target.value)} // Store raw input as string
           className="w-20 rounded-lg"
-          disabled={product.stock === 0 || isAddingToCart}
+          disabled={product.stock === 0 || isAdding}
+          placeholder="1"
         />
         <Button
           onClick={handleAddToCart}
           className="bg-primary text-white rounded-lg flex-1"
-          disabled={product.stock === 0 || isAddingToCart}
+          disabled={product.stock === 0 || isAdding}
         >
-          {isAddingToCart ? 'Adding...' : product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
+          {isAdding ? 'Adding...' : product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
         </Button>
       </CardFooter>
     </Card>

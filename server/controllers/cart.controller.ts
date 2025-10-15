@@ -5,7 +5,6 @@ import { validateObjectId } from "../utils/validateObjectId";
 
 const ID_ERROR_MESSAGE = 'Invalid Product ID';
 
-// Get user's cart
 export const getCart = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
@@ -49,99 +48,133 @@ export const getCart = async (req: Request, res: Response) => {
   }
 };
 
-// Add item to cart
+import mongoose from "mongoose";
+
 export const addToCart = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const userId = req.user?._id;
     const { productId, quantity } = req.body;
 
     if (!userId) {
+      await session.abortTransaction();
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) return;
+    if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) {
+      await session.abortTransaction();
+      return;
+    }
 
     if (!quantity || quantity < 1) {
+      await session.abortTransaction();
       return res.status(400).json({ message: "Invalid quantity" });
     }
 
-    // Check if product exists and is active
-    const product = await Product.findOne({ _id: productId, isActive: true });
+    // 🔒 Lock product document for this transaction
+    const product = await Product.findOne({ _id: productId, isActive: true })
+      .session(session)
+      .exec();
+
     if (!product) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "Product not found or inactive" });
     }
 
-    // Check stock
+    // Check stock again inside transaction
     if (quantity > product.stock) {
+      await session.abortTransaction();
       return res.status(400).json({
-        message: `Only ${product.stock} items available in stock`
+        message: `Only ${product.stock} items available in stock`,
       });
     }
 
-    // Find or create cart
-    let cart = await Cart.findOne({ user: userId });
+    // Find or create cart (transaction-safe)
+    let cart = await Cart.findOne({ user: userId }).session(session);
     if (!cart) {
-      cart = await Cart.create({ user: userId, items: [] });
+      cart = new Cart({ user: userId, items: [] });
     }
 
-    // Check if product already in cart
     const existingItemIndex = cart.items.findIndex(
       (item: any) => item.product.toString() === productId
     );
 
     if (existingItemIndex > -1) {
       // Update quantity
-      const newQuantity = (cart.items[existingItemIndex] as CartItemDocument).quantity + quantity;
+      const newQuantity =
+        (cart.items[existingItemIndex] as CartItemDocument).quantity + quantity;
 
       if (newQuantity > product.stock) {
+        await session.abortTransaction();
         return res.status(400).json({
-          message: `Cannot add more. Only ${product.stock} items available in stock`
+          message: `Cannot add more. Only ${product.stock} items available in stock`,
         });
       }
 
       (cart.items[existingItemIndex] as CartItemDocument).quantity = newQuantity;
     } else {
-      // Add new item
       cart.items.push({ product: productId, quantity });
     }
 
-    await cart.save();
+    await cart.save({ session });
 
-    // Populate and return
-    cart = await cart.populate({
-      path: "items.product",
-      select: "name price image stock category slug isActive",
-    });
+    // reduce product stock immediately (optional business logic)
+    // product.stock -= quantity;
+    // await product.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // Populate outside transaction for cleaner response
+    const populatedCart = await Cart.findById(cart._id)
+      .populate({
+        path: "items.product",
+        select: "name price image stock category slug isActive",
+      })
+      .lean();
 
     return res.status(200).json({
       message: "Item added to cart successfully",
-      cart,
+      cart: populatedCart,
     });
   } catch (error) {
     console.error("Error in addToCart controller", error);
+    await session.abortTransaction();
+    session.endSession();
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-// Update item quantity
 export const updateCartItem = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const userId = req.user?._id;
     const { productId } = req.params;
     const { quantity } = req.body;
 
     if (!userId) {
+      await session.abortTransaction();
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) return;
+    if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) {
+      await session.abortTransaction();
+      return;
+    }
 
     if (!quantity || quantity < 1) {
+      await session.abortTransaction();
       return res.status(400).json({ message: "Invalid quantity" });
     }
 
-    const cart = await Cart.findOne({ user: userId });
+    // Find cart and lock for transaction
+    const cart = await Cart.findOne({ user: userId }).session(session);
     if (!cart) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "Cart not found" });
     }
 
@@ -150,29 +183,47 @@ export const updateCartItem = async (req: Request, res: Response) => {
     );
 
     if (itemIndex === -1) {
+      await session.abortTransaction();
       return res.status(404).json({ message: "Item not found in cart" });
     }
 
-    // Check stock
-    const product = await Product.findById(productId);
+    // Lock product for this transaction
+    const product = await Product.findOne({ _id: productId, isActive: true })
+      .session(session)
+      .exec();
+
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      await session.abortTransaction();
+      return res.status(404).json({ message: "Product not found or inactive" });
     }
 
+    // Validate stock again inside transaction
     if (quantity > product.stock) {
+      await session.abortTransaction();
       return res.status(400).json({
-        message: `Only ${product.stock} items available in stock`
+        message: `Only ${product.stock} items available in stock`,
       });
     }
 
+    // Update quantity
     (cart.items[itemIndex] as CartItemDocument).quantity = quantity;
-    await cart.save();
 
-    // Populate and return
-    const updatedCart = await cart.populate({
-      path: "items.product",
-      select: "name price image stock category slug isActive",
-    });
+    await cart.save({ session });
+
+    // (Optional) If you reserve stock for cart items, you could also:
+    // product.stock -= quantity; 
+    // await product.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // Populate outside transaction for cleaner response
+    const updatedCart = await Cart.findById(cart._id)
+      .populate({
+        path: "items.product",
+        select: "name price image stock category slug isActive",
+      })
+      .lean();
 
     return res.status(200).json({
       message: "Cart updated successfully",
@@ -180,15 +231,16 @@ export const updateCartItem = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error in updateCartItem controller", error);
+    await session.abortTransaction();
+    session.endSession();
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-// Remove item from cart
 export const removeFromCart = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;
-    const { productId } = req.params;
+    const productId  = req.params.productId;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -223,7 +275,6 @@ export const removeFromCart = async (req: Request, res: Response) => {
   }
 };
 
-// Clear cart
 export const clearCart = async (req: Request, res: Response) => {
   try {
     const userId = req.user?._id;

@@ -5,7 +5,7 @@ const UnleashCreativity: React.FC = () => {
     <section className="py-20 bg-gradient-to-b from-white to-[#FAF5F0]">
       <div className="container mx-auto px-4">
         {/* Heading */}
-        <h2 className="text-4xl font-bold  text-center mb-6 text-accent">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tighter md:font-bold text-center mb-6 text-primary max-w-[80vw] mx-auto md:max-w-[unset] leading-tight">
           Unleash Your Creativity With InstaSip
         </h2>
         <p className="md:text-center text-lg mb-16 max-w-2xl mx-auto text-gray-600">
@@ -23,7 +23,7 @@ const UnleashCreativity: React.FC = () => {
               className="w-full h-80 object-cover group-hover:opacity-70 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
-              <h3 className="text-2xl font-semibold text-white mb-2">Hot Brew</h3>
+              <h3 className="text-2xl tracking-tighter text-white mb-2">Hot Brew</h3>
               <p className="text-white/90">Classic warmth in seconds.</p>
             </div>
           </div>
@@ -36,7 +36,7 @@ const UnleashCreativity: React.FC = () => {
               className="w-full h-80 object-cover group-hover:opacity-70 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
-              <h3 className="text-2xl font-semibold text-white mb-2">Iced Delight</h3>
+              <h3 className="text-2xl tracking-tighter text-white mb-2">Iced Delight</h3>
               <p className="text-white/90">Refresh with a chill twist.</p>
             </div>
           </div>
@@ -49,7 +49,7 @@ const UnleashCreativity: React.FC = () => {
               className="w-full h-80 object-cover group-hover:opacity-70 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
-              <h3 className="text-2xl font-semibold text-white mb-2">Your Recipe</h3>
+              <h3 className="text-2xl tracking-tighter text-white mb-2">Your Recipe</h3>
               <p className="text-white/90">Mix and match flavors.</p>
             </div>
           </div>

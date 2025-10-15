@@ -73,6 +73,8 @@ const AuthForm = ({ type }: AuthFormProps) => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 animate-fade-in">
         {/* Header Section */}
         <div className="text-center mb-6">
+
+        <div className="md:hidden flex justify-center my-8"><img src="/logo.jpg" alt='InstaSip' className='rounded-full md:w-50 md:h-50'/></div>
           {type === 'signup' ? (
             <>
               <h2 className="text-2xl font-bold text-accent">Create Account</h2>
