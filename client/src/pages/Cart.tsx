@@ -205,7 +205,7 @@ const Cart = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 pt-20 md:pt-24 min-h-screen bg-background">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Your Cart</h1>
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center mt-6 md:mt-0">Your Cart</h1>
 
       {cartError && (
         <div className="mb-4">
@@ -280,7 +280,7 @@ const Cart = () => {
             </div>
 
             <div className="lg:col-span-1">
-              <Card className="sticky top-20">
+              <Card className="sticky top-20 mb-20 md:mb-0">
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>

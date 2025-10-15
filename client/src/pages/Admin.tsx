@@ -10,10 +10,10 @@ const Admin = () => {
   const [activeTab, setActiveTab] = useState<TabType>('orders');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 md:px-8 pt-20 md:pt-24">
         {/* Header Section */}
-        <div className="mb-4 text-center">
+        <div className="my-4 md:mt-0 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-accent mb-2 tracking-tight">Admin Panel</h1>
         </div>
 
@@ -68,7 +68,7 @@ const Admin = () => {
         </div>
 
         {/* Content Section */}
-        <div className="animate-fade-in">
+        <div className="animate-fade-in pb-20 md:pb-0">
           {activeTab === 'orders' && <AdminOrders />}
           {activeTab === 'products' && <AdminProducts />}
           {activeTab === 'payments' && <AdminPayments />}

@@ -97,8 +97,8 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 pt-20 md:pt-24 min-h-screen bg-background">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6">My Profile</h1>
+    <div className="max-w-7xl mx-auto p-4 pt-20 md:pt-24 min-h-screen">
+      <h1 className="text-2xl md:text-3xl font-bold my-6">My Profile</h1>
 
       {/* User Info Card */}
       <Card className="mb-6 md:mb-8">
@@ -153,7 +153,7 @@ const Profile = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 mb-20 md:mb-0">
               {orders.map(order => (
                 <Card key={order._id} className="overflow-hidden border-l-4" style={{ borderLeftColor: order.status === 'delivered' ? '#10b981' : order.status === 'cancelled' ? '#ef4444' : '#A86934' }}>
                   <CardContent className="p-4 md:p-6">
