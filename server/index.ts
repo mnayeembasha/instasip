@@ -68,12 +68,12 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Page Not Found" });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    connectDB();
-});
-// connectDB();
-// export default app;
+// app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+//     connectDB();
+// });
+connectDB();
+export default app;
 
 // if (process.env.NODE_DEPLOY !== "lambda") {
 //   const PORT = process.env.PORT;
