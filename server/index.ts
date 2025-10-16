@@ -48,7 +48,7 @@ const stagePrefix = '/prod'; // can also use process.env.API_STAGE
 const routerPrefix = `${stagePrefix}/api`;
 
 app.get(`${routerPrefix}/health`, (req: Request, res: Response) => {
-    res.status(200).json({ status: "OK", message: "Hello from Instasip!" });
+    res.status(200).json({ status: "OK", message: "Hello from Instasip Backend API!" });
 });
 
 // Use the same prefix for other routes

@@ -43,7 +43,7 @@ jobs:
           cd ..
           rm -rf deploy_temp
 
-      # 6️⃣ Deploy to Lambda
+      # 6️⃣ Deploy to AWS Lambda
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@v0.1.9
         with:
@@ -54,3 +54,17 @@ jobs:
           handler: "lambda.lambdaHandler"
           zip_file: function.zip
           publish: true
+
+      #  Deploy HTTP API Gateway (apigatewayv2)
+      - name: Deploy HTTP API Gateway stage
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          echo "Deploying HTTP API Gateway stage..."
+          aws apigatewayv2 create-deployment \
+            --api-id qs1ohhx6q9 \
+            --stage-name prod \
+            --region $AWS_REGION
+          echo "✅ HTTP API Gateway redeployed successfully!"
