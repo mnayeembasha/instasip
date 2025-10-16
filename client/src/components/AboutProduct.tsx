@@ -6,7 +6,7 @@ const AboutProduct: React.FC = () => {
     <section id="about" className="py-16 bg-gray-50 ">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Heading & Description */}
-        <div className="text-center mb-16">
+        <div data-aos="fade-in" className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tighter font-bold text-primary mb-4">
             About Our Product
           </h2>
@@ -17,17 +17,17 @@ const AboutProduct: React.FC = () => {
 
         {/* Second Row: Features */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="flex flex-col items-center text-center p-6  bg-[#F9EEDC] rounded-xl shadow hover:shadow-lg transition">
+          <div data-aos="zoom-in" className="flex flex-col items-center text-center p-6  bg-[#F9EEDC] rounded-xl shadow hover:shadow-lg transition">
             <IconLeaf className="text-primary w-12 h-12 mb-3" />
             <h4 className="tracking-tight text-gray-800 mb-1">Organic Leaves</h4>
             <p className="text-gray-600 text-sm">Fresh, premium green tea leaves in every cup.</p>
           </div>
-          <div className="flex flex-col items-center text-center p-6 bg-[#F9EEDC] rounded-xl shadow hover:shadow-lg transition">
+          <div data-aos="zoom-in" className="flex flex-col items-center text-center p-6 bg-[#F9EEDC] rounded-xl shadow hover:shadow-lg transition">
             <IconClock className="text-primary w-12 h-12 mb-3" />
             <h4 className=" text-gray-800 mb-1">Brew in Seconds</h4>
             <p className="text-gray-600 text-sm">Instant tea with no mess or waiting time.</p>
           </div>
-          <div className="flex flex-col items-center text-center p-6 bg-[#F9EEDC] rounded-xl shadow hover:shadow-lg transition">
+          <div data-aos="zoom-in" className="flex flex-col items-center text-center p-6 bg-[#F9EEDC] rounded-xl shadow hover:shadow-lg transition">
             <IconCup className="text-primary w-12 h-12 mb-3" />
             <h4 className=" text-gray-800 mb-1">Portable & Safe</h4>
             <p className="text-gray-600 text-sm">Enjoy tea anywhere with spill-free, travel-ready cups.</p>

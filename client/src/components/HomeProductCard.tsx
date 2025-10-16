@@ -10,7 +10,7 @@ interface HomeProductCardProps {
 
 const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, price, image,link }) => {
   return (
-    <div className="relative rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in-up">
+    <div data-aos="fade-in" className="relative rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in-up">
       {/* Product Image */}
       <img src={image} alt={name} className="w-full h-96 object-cover" />
 

@@ -22,8 +22,8 @@ const Benefits: React.FC = () => {
 
               {/* Overlay with text */}
               <div className="absolute inset-0 bg-black/70 bg-opacity-30 flex flex-col justify-end p-4">
-                <h3 className="text-xl tracking-tighter text-white">{benefit.title}</h3>
-                <p className="text-sm text-gray-300 mt-1">{benefit.desc}</p>
+                <h3 data-aos="fade-in-up" className="text-xl tracking-tighter text-white">{benefit.title}</h3>
+                <p data-aos="fade-in-up" className="text-sm text-gray-300 mt-1">{benefit.desc}</p>
               </div>
             </div>
           ))}

@@ -37,12 +37,12 @@ const DiscoverProducts: React.FC = () => {
   return (
     <section id="products" className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl md:text-5xl lg:text-6xl text-center mb-6 text-primary tracking-tighter md:font-bold">
+        <h2 data-aos="fade-in" className="text-4xl md:text-5xl lg:text-6xl text-center mb-6 text-primary tracking-tighter md:font-bold">
           Discover Our Products
         </h2>
 
         {/* Tabs */}
-        <div className="flex justify-center mb-12">
+        <div  data-aos="fade-in"  className="flex justify-center mb-12">
           <div className="flex bg-secondary/10 rounded-full p-1 tracking-tighter">
             <button
               onClick={() => setActiveTab('all')}

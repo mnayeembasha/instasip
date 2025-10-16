@@ -20,8 +20,8 @@ const WhyChooseUs: React.FC = () => {
             />
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/70 bg-opacity-40 flex flex-col justify-end items-center px-6 py-8">
-              <h3 className="text-2xl tracking-tighter mb-2 text-white">Innovative & Convenient</h3>
-              <p className="text-gray-300 text-center">Trendy, marketable, affordable & scalable.</p>
+              <h3 data-aos="fade-in" className="text-2xl tracking-tighter mb-2 text-white">Innovative & Convenient</h3>
+              <p data-aos="fade-in" className="text-gray-300 text-center">Trendy, marketable, affordable & scalable.</p>
             </div>
           </div>
 
@@ -34,8 +34,8 @@ const WhyChooseUs: React.FC = () => {
             />
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/70 bg-opacity-40 flex flex-col justify-end items-center px-6 py-8">
-              <h3 className="text-2xl tracking-tighter mb-2 text-white">Sustainable Choice</h3>
-              <p className="text-gray-300 text-center">Blends tradition with innovation for a lifestyle brand.</p>
+              <h3 data-aos="fade-in" className="text-2xl tracking-tighter mb-2 text-white">Sustainable Choice</h3>
+              <p data-aos="fade-in"className="text-gray-300 text-center">Blends tradition with innovation for a lifestyle brand.</p>
             </div>
           </div>
         </div>

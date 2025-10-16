@@ -31,7 +31,7 @@ const Hero: React.FC = () => {
       className="flex flex-col justify-center items-center font-archivo text-neutral-950 pt-20 md:py-20 bg-gradient-to-r from-amber-200 via-amber-50 to-amber-200"
     >
       {/* Content */}
-      <div className="container mx-auto px-4 text-center pt-15 mb-12 ">
+      <div data-aos="fade-out" className="container mx-auto px-4 text-center pt-15 mb-12 ">
         <motion.h1 
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}

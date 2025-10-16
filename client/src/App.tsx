@@ -23,6 +23,8 @@ import InstasipBenefits from "./pages/InstasipBenefits";
 import NotFound from "./pages/NotFound";
 import YouAreOffline from "./pages/YouAreOffline";
 import useOffline from "./hooks/useOffline";
+import AOS from "aos";
+import "aos/dist/aos.css"; 
 
 const Admin = lazy(() => import("@/pages/Admin"));
 
@@ -43,6 +45,15 @@ const AppContent = () => {
       dispatch(fetchCart());
     }
   }, [dispatch, currentUser, isCheckingAuth]);
+
+  useEffect(() => {
+    AOS.init({
+      // duration: 800, 
+      easing: "ease-in-out", 
+      once: false, // whether animation should happen only once
+      mirror: false, // whether elements should animate out while scrolling past them
+    });
+  }, []);
 
   if (isOffline) {
     return <YouAreOffline />;

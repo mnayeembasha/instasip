@@ -238,7 +238,7 @@ const ProductDetails = () => {
                     />
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 mb-10 md:mb-0">
                     <Button
                       onClick={handleAddToCart}
                       disabled={currentProduct.stock === 0 || isAddingToCart}

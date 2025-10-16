@@ -68,7 +68,7 @@ const InstasipBenefitsHomepage = () => {
     <div className="font-archivo py-20 sm:px-6 px-4 lg:px-15" style={{ backgroundColor: '#FAFAFA' }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-20">
+        <div data-aos="fade-in" className="text-center mb-20">
           <div className="inline-block px-4 py-2 rounded-full mb-4" style={{ backgroundColor: '#A86934', color: 'white' }}>
             <span className="text-sm font-semibold tracking-wide">REVOLUTIONIZING TEA</span>
           </div>
@@ -105,7 +105,7 @@ const InstasipBenefitsHomepage = () => {
 
 
             {/* Top Benefit */}
-            <div className="absolute -top-5 left-1/2 transform -translate-x-1/2">
+            <div data-aos="fade-in" className="absolute -top-5 left-1/2 transform -translate-x-1/2">
               <div className="group cursor-pointer">
                 <BenefitCard benefit={benefits[0]} />
                 <div className="w-0.5 h-6 bg-gradient-to-b from-gray-200 to-transparent mx-auto"></div>
@@ -113,7 +113,7 @@ const InstasipBenefitsHomepage = () => {
             </div>
 
             {/* Right Benefit */}
-            <div className="absolute top-1/2 right-8 transform -translate-y-1/2">
+            <div data-aos="fade-right" className="absolute top-1/2 right-8 transform -translate-y-1/2">
               <div className="group cursor-pointer flex items-center">
                 <div className="w-16 h-0.5 bg-gradient-to-l from-gray-200 to-transparent"></div>
                 <div className="hover:translate-x-2 transition-all duration-300">
@@ -123,7 +123,7 @@ const InstasipBenefitsHomepage = () => {
             </div>
 
             {/* Bottom Right Benefit */}
-            <div className="absolute bottom-4 right-32 transform translate-y-0">
+            <div data-aos="fade-right" className="absolute bottom-4 right-32 transform translate-y-0">
               <div className="group cursor-pointer">
                 <div className="w-0.5 h-16 bg-gradient-to-t from-gray-200 to-transparent mx-auto mb-0"></div>
                 <div className="hover:translate-y-2 transition-all duration-300">
@@ -133,7 +133,7 @@ const InstasipBenefitsHomepage = () => {
             </div>
 
             {/* Bottom Left Benefit */}
-            <div className="absolute bottom-4 left-32 transform translate-y-0">
+            <div data-aos="fade-left" className="absolute bottom-4 left-32 transform translate-y-0">
               <div className="group cursor-pointer">
                 <div className="w-0.5 h-16 bg-gradient-to-t from-gray-200 to-transparent mx-auto mb-0"></div>
                 <div className="hover:translate-y-2 transition-all duration-300">
@@ -143,7 +143,7 @@ const InstasipBenefitsHomepage = () => {
             </div>
 
             {/* Left Benefit */}
-            <div className="absolute top-1/2 left-8 transform -translate-y-1/2">
+            <div data-aos="fade-left" className="absolute top-1/2 left-8 transform -translate-y-1/2">
               <div className="group cursor-pointer flex items-center">
                 <div className="hover:-translate-x-2 transition-all duration-300">
                   <BenefitCard benefit={benefits[4]} />
@@ -183,7 +183,7 @@ const InstasipBenefitsHomepage = () => {
             {benefits.map((benefit, idx) => {
               const Icon = benefit.icon;
               return (
-                <div key={idx} className="group cursor-pointer">
+                <div data-aos={idx % 2 === 0 ? "fade-up" : "fade-right"} key={idx} className="group cursor-pointer">
                   <div className="bg-gradient-to-tr from-white  to-amber-50 rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
                       <Icon className="w-6 h-6 text-white" />
@@ -199,7 +199,7 @@ const InstasipBenefitsHomepage = () => {
 
         {/* Feature Highlight */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-gradient-to-br rounded-3xl p-10 text-white shadow-xl hover:shadow-2xl transition-all duration-300" style={{ background: 'linear-gradient(135deg, #4D301A 0%, #A86934 100%)' }}>
+          <div data-aos="fade-in" className="bg-gradient-to-br rounded-3xl p-10 text-white shadow-xl hover:shadow-2xl transition-all duration-300" style={{ background: 'linear-gradient(135deg, #4D301A 0%, #A86934 100%)' }}>
             <h3 className="text-3xl font-bold mb-4">First of Its Kind</h3>
             <p className="text-lg mb-6 text-white/90">
               Revolutionary 270 GSM food-grade paper cup with smart infusion technology. No wax coating, 100% biodegradable.
@@ -210,7 +210,7 @@ const InstasipBenefitsHomepage = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100">
+          <div data-aos="fade-in" className="bg-white rounded-3xl p-10 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100">
             <h3 className="text-3xl font-bold mb-4 text-primary">Perfect for Corporates</h3>
             <ul className="space-y-3">
               {['Save operational hours', 'Reduce water usage', 'Eco-conscious branding', 'Energized workforce'].map((item, idx) => (

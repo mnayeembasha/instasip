@@ -23,8 +23,8 @@ const UnleashCreativity: React.FC = () => {
               className="w-full h-80 object-cover group-hover:opacity-70 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
-              <h3 className="text-2xl tracking-tighter text-white mb-2">Hot Brew</h3>
-              <p className="text-white/90">Classic warmth in seconds.</p>
+              <h3 data-aos="fade-in" className="text-2xl tracking-tighter text-white mb-2">Hot Brew</h3>
+              <p data-aos="fade-in" className="text-white/90">Classic warmth in seconds.</p>
             </div>
           </div>
 
@@ -36,8 +36,8 @@ const UnleashCreativity: React.FC = () => {
               className="w-full h-80 object-cover group-hover:opacity-70 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
-              <h3 className="text-2xl tracking-tighter text-white mb-2">Iced Delight</h3>
-              <p className="text-white/90">Refresh with a chill twist.</p>
+              <h3 data-aos="fade-in" className="text-2xl tracking-tighter text-white mb-2">Iced Delight</h3>
+              <p data-aos="fade-in" className="text-white/90">Refresh with a chill twist.</p>
             </div>
           </div>
 
@@ -48,9 +48,9 @@ const UnleashCreativity: React.FC = () => {
               alt="Custom"
               className="w-full h-80 object-cover group-hover:opacity-70 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
-              <h3 className="text-2xl tracking-tighter text-white mb-2">Your Recipe</h3>
-              <p className="text-white/90">Mix and match flavors.</p>
+            <div  className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center px-4 transition-all duration-500 group-hover:bg-black/50">
+              <h3 data-aos="fade-in" className="text-2xl tracking-tighter text-white mb-2">Your Recipe</h3>
+              <p data-aos="fade-in" className="text-white/90">Mix and match flavors.</p>
             </div>
           </div>
         </div>
