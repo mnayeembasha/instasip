@@ -1,4 +1,4 @@
-import { IconError404, IconHome, IconArrowLeft } from '@tabler/icons-react';
+import {  IconHome, IconArrowLeft } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const NotFound = () => {

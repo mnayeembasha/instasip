@@ -49,7 +49,7 @@ const stagePrefix = '/prod'; // can also use process.env.API_STAGE
 const routerPrefix = `${stagePrefix}/api`;
 
 app.get(`${routerPrefix}/health`, (req: Request, res: Response) => {
-    res.status(200).json({ status: "OK", message: "Hello from Instasip Backend API!" });
+    res.status(200).json({ status: "OK", message: "Hello from Instasip API!" });
 });
 
 // Use the same prefix for other routes
@@ -69,11 +69,11 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Page Not Found" });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    connectRedis();
-    connectDB();
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+//     connectRedis();
+//     connectDB();
+// });
 //connectRedis();
 // connectDB();
 export default app;

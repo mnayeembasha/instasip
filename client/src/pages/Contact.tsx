@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { IconPhone, IconMail, IconBrandInstagram, IconMapPin, IconClock, IconMessageCircle } from '@tabler/icons-react';
+import { IconPhone, IconMail, IconBrandInstagram, IconMapPin, IconMessageCircle } from '@tabler/icons-react';
 
 const Contact = () => {
   return (
