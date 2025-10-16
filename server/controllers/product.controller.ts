@@ -2,8 +2,11 @@ import { type Request, type Response } from "express";
 import { Product, type ProductDocument } from "../models/Product";
 import { validateObjectId } from "../utils/validateObjectId";
 import cloudinary from "../lib/cloudinary";
+import redisClient from "../lib/redisClient";
+import {clearProductCache} from "../utils/clearCache";
 
 const ID_ERROR_MESSAGE = 'Invalid Product ID';
+
 
 export const getProducts = async (req: Request, res: Response) => {
     try {
@@ -34,12 +37,36 @@ export const getProducts = async (req: Request, res: Response) => {
             sortOption = { price: -1 };
         }
 
-        const products = await Product.find(filter).sort(sortOption);
-        if(!products || products.length === 0){
-            return res.status(200).json({message:"No Products found with applied filters"});
-        }else{
+        // Create cache key
+        const cacheKey = `products:${JSON.stringify(filter)}:sort:${JSON.stringify(sortOption)}`;
+        
+        // Check cache
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            const products = JSON.parse(cachedData);
+            if (!products || products.length === 0) {
+                return res.status(200).json({ message: "No Products found with applied filters" });
+            }
             return res.status(200).json({
                 message: "Products fetched successfully",
+                source: "cache",
+                products
+            });
+        }
+
+        // Query database if not in cache
+        const products = await Product.find(filter).sort(sortOption);
+        
+        // Save in Redis and track key
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(products)); // 5 minutes
+        await redisClient.sAdd("product:cacheKeys", cacheKey);
+
+        if (!products || products.length === 0) {
+            return res.status(200).json({ message: "No Products found with applied filters" });
+        } else {
+            return res.status(200).json({
+                message: "Products fetched successfully",
+                source: "db",
                 products
             });
         }
@@ -53,18 +80,38 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const getProductById = async (req: Request, res: Response) => {
     const productId = req.params.id;
-    if (!validateObjectId(productId as string,ID_ERROR_MESSAGE, res)) return;
+    if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) return;
 
     try {
-        const product = await Product.findOne({ _id: productId, isActive: true });
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }else{
+        // Create cache key
+        const cacheKey = `product:${productId}`;
+        
+        // Check cache
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            const product = JSON.parse(cachedData);
             return res.status(200).json({
                 message: "Product fetched successfully",
+                source: "cache",
                 product
             });
         }
+
+        // Query database if not in cache
+        const product = await Product.findOne({ _id: productId, isActive: true });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // Save in Redis and track key
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(product)); 
+        await redisClient.sAdd("product:cacheKeys", cacheKey);
+
+        return res.status(200).json({
+            message: "Product fetched successfully",
+            source: "db",
+            product
+        });
     } catch (error) {
         console.error("Error in getProductById controller", error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -72,22 +119,42 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 export const getProductBySlug = async (req: Request, res: Response) => {
-  const { slug } = req.params;
+    const { slug } = req.params;
 
-  try {
-    const product = await Product.findOne({ slug, isActive: true });
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    try {
+        // Create cache key
+        const cacheKey = `product:slug:${slug}`;
+        
+        // Check cache
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            const product = JSON.parse(cachedData);
+            return res.status(200).json({
+                message: "Product fetched successfully",
+                source: "cache",
+                product
+            });
+        }
+
+        // Query database if not in cache
+        const product = await Product.findOne({ slug, isActive: true });
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // Save in Redis and track key
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(product)); // 5 minutes
+        await redisClient.sAdd("product:cacheKeys", cacheKey);
+
+        return res.status(200).json({
+            message: "Product fetched successfully",
+            source: "db",
+            product,
+        });
+    } catch (error) {
+        console.error("Error in getProductBySlug controller", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-
-    return res.status(200).json({
-      message: "Product fetched successfully",
-      product,
-    });
-  } catch (error) {
-    console.error("Error in getProductBySlug controller", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
 };
 
 
@@ -101,7 +168,7 @@ export const createProduct = async (req: Request, res: Response) => {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
             const mimeType = image.split(';')[0].split(':')[1];
             if (!allowedTypes.includes(mimeType)) {
-              return res.status(400).json({ message: 'Invalid image format' });
+                return res.status(400).json({ message: 'Invalid image format' });
             }
             const base64Data = image.split(';base64,').pop() || '';
             const buffer = Buffer.from(base64Data, 'base64');
@@ -126,6 +193,9 @@ export const createProduct = async (req: Request, res: Response) => {
             stock,
             category
         });
+
+        // Clear product cache after creation
+        await clearProductCache();
 
         return res.status(201).json({
             message: "Product created successfully",
@@ -162,7 +232,7 @@ export const updateProduct = async (req: Request, res: Response) => {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
             const mimeType = image.split(';')[0].split(':')[1];
             if (!allowedTypes.includes(mimeType)) {
-              return res.status(400).json({ message: 'Invalid image format' });
+                return res.status(400).json({ message: 'Invalid image format' });
             }
             const base64Data = image.split(';base64,').pop() || '';
             const buffer = Buffer.from(base64Data, 'base64');
@@ -200,6 +270,9 @@ export const updateProduct = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
+        // Clear product cache after update
+        await clearProductCache();
+
         return res.status(200).json({
             message: "Product updated successfully",
             product: updatedProduct
@@ -234,6 +307,9 @@ export const deleteProduct = async (req: Request, res: Response) => {
         if (!deletedProduct) {
             return res.status(404).json({ message: "Product not found" });
         }
+
+        // Clear product cache after deletion
+        await clearProductCache();
 
         return res.status(200).json({
             message: "Product deleted successfully",
@@ -270,10 +346,30 @@ export const getAllProductsForAdmin = async (req: Request, res: Response) => {
             ];
         }
 
+        // Create cache key
+        const cacheKey = `admin:products:${JSON.stringify(filter)}`;
+        
+        // Check cache
+        const cachedData = await redisClient.get(cacheKey);
+        if (cachedData) {
+            const products = JSON.parse(cachedData);
+            return res.status(200).json({
+                message: "All products fetched successfully",
+                source: "cache",
+                products
+            });
+        }
+
+        // Query database if not in cache
         const products = await Product.find(filter).sort({ createdAt: -1 });
+
+        // Save in Redis and track key
+        await redisClient.setEx(cacheKey, 300, JSON.stringify(products)); // 5 minutes
+        await redisClient.sAdd("product:cacheKeys", cacheKey);
 
         return res.status(200).json({
             message: "All products fetched successfully",
+            source: "db",
             products
         });
     } catch (error) {
@@ -284,7 +380,7 @@ export const getAllProductsForAdmin = async (req: Request, res: Response) => {
 
 export const changeProductStatus = async (req: Request, res: Response) => {
     try {
-        const  productId  = req.params.id;
+        const productId = req.params.id;
         const { isActive } = req.body;
 
         if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) return;
@@ -298,6 +394,9 @@ export const changeProductStatus = async (req: Request, res: Response) => {
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
+
+        // Clear product cache after status change
+        await clearProductCache();
 
         return res.status(200).json({
             message: `Product status updated to ${product.isActive ? "active" : "inactive"}`,

@@ -16,6 +16,17 @@ const Products = () => {
   const [category, setCategory] = useState<string|undefined>(undefined);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('');
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+
+  // Fetch all categories on initial load
+  useEffect(() => {
+    dispatch(fetchProducts({})).then((result) => {
+      if (result.payload && Array.isArray(result.payload)) {
+        const cats = [...new Set(result.payload.map((p: any) => p.category))];
+        setAllCategories(cats);
+      }
+    });
+  }, [dispatch]);
 
   useEffect(() => {
     // Extract price and sortBy from the selected value
@@ -31,11 +42,7 @@ const Products = () => {
     dispatch(fetchProducts({ category, search, sortBy: sortByFilter, price: priceFilter }));
   }, [category, search, sortBy, dispatch]);
 
-  const categories = [...new Set(products.map(p => p.category))];
-
   return (
-
-
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         {/* Header Section */}
@@ -70,7 +77,7 @@ const Products = () => {
                   <SelectValue placeholder="Category"/>
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
-                  {categories.map(cat => (
+                  {allCategories.map(cat => (
                     <SelectItem
                       key={cat}
                       value={cat}

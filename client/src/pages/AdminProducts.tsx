@@ -16,7 +16,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { type ProductType } from '@/types';
 
-interface Filter{
+interface Filter {
   status?: string;
   category?: string;
   search?: string;
@@ -28,35 +28,47 @@ const AdminProducts = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [status, setStatus] = useState<string|undefined>(undefined);
-  const [category, setCategory] = useState<string|undefined>(undefined);
+  const [status, setStatus] = useState<string | undefined>(undefined);
+  const [category, setCategory] = useState<string | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
 
   // Alert dialog states
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; productId: string | null }>({
     open: false,
-    productId: null
+    productId: null,
   });
   const [toggleDialog, setToggleDialog] = useState<{ open: boolean; productId: string | null; isActive: boolean }>({
     open: false,
     productId: null,
-    isActive: false
+    isActive: false,
   });
 
-  const categories = [...new Set(adminProducts.map(p => p.category))];
+  // Fetch all categories on initial load
+  useEffect(() => {
+    if (!user?.isAdmin) {
+      navigate('/');
+    } else {
+      dispatch(fetchAdminProducts({})).then((result) => {
+        if (result.payload && Array.isArray(result.payload)) {
+          const cats = [...new Set(result.payload.map((p: any) => p.category))];
+          setAllCategories(cats);
+        }
+      });
+    }
+  }, [dispatch, user, navigate]);
 
   useEffect(() => {
-    if (!user?.isAdmin) navigate('/');
-    else {
+    if (user?.isAdmin) {
       const filters: Filter = {};
       if (status !== 'all') filters.status = status;
       if (category !== 'all') filters.category = category;
       if (search) filters.search = search;
       dispatch(fetchAdminProducts(filters));
     }
-  }, [status, category, search, user, dispatch, navigate]);
+  }, [status, category, search, user, dispatch]);
 
   const handleSubmit = (data: unknown) => {
     if (editingProduct) {
@@ -76,15 +88,15 @@ const AdminProducts = () => {
 
   const handleDeleteConfirm = () => {
     if (deleteDialog.productId) {
-       dispatch(deleteProduct(deleteDialog.productId)).then(() => {
-      // Refetch products after deletion
-      const filters: Filter = {};
-      if (status !== 'all') filters.status = status;
-      if (category !== 'all') filters.category = category;
-      if (search) filters.search = search;
-      dispatch(fetchAdminProducts(filters));
-    });
-    setDeleteDialog({ open: false, productId: null });
+      dispatch(deleteProduct(deleteDialog.productId)).then(() => {
+        // Refetch products after deletion
+        const filters: Filter = {};
+        if (status !== 'all') filters.status = status;
+        if (category !== 'all') filters.category = category;
+        if (search) filters.search = search;
+        dispatch(fetchAdminProducts(filters));
+      });
+      setDeleteDialog({ open: false, productId: null });
     }
   };
 
@@ -92,7 +104,7 @@ const AdminProducts = () => {
     if (toggleDialog.productId) {
       dispatch(toggleProductStatus({
         id: toggleDialog.productId,
-        isActive: !toggleDialog.isActive
+        isActive: !toggleDialog.isActive,
       }));
       setToggleDialog({ open: false, productId: null, isActive: false });
     }
@@ -116,18 +128,8 @@ const AdminProducts = () => {
               </h1>
               <p className="text-gray-600">Manage your product inventory and availability</p> */}
             </div>
-{/* <Button
-  className="bg-gradient-to-r bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
-  onClick={() => {
-    setEditingProduct(null);
-    setOpen(true);
-  }}
->
-  <IconPlus className="w-5 h-5 mr-2" />
-  Add New Product
-</Button> */}
-<Dialog open={open} onOpenChange={handleDialogClose}>
-  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <Dialog open={open} onOpenChange={handleDialogClose}>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold">
                     {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -149,88 +151,85 @@ const AdminProducts = () => {
         {/* Filters Section */}
         <Card className="mb-8 p-6 border-0 bg-white">
           <div className="flex flex-col md:flex-row gap-4">
-                {/* Input Search */}
+            {/* Input Search */}
+            <div className="relative flex-1">
+              <IconSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input
+                placeholder="Search products..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-12 h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary transition-all"
+              />
+            </div>
 
-           <div className="relative flex-1">
-      <IconSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-      <Input
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="pl-12 h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary transition-all"
-      />
-    </div>
+            {/* Status Select */}
+            <div className="relative flex-1 flex justify-center items-center">
+              <IconCircleCheck className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-primary focus:ring-primary w-full">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem
+                    value="all"
+                    className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
+                  >
+                    All
+                  </SelectItem>
+                  <SelectItem
+                    value="active"
+                    className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
+                  >
+                    Active
+                  </SelectItem>
+                  <SelectItem
+                    value="inactive"
+                    className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
+                  >
+                    Inactive
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-    {/* Status Select */}
-    <div className="relative flex-1 flex justify-center items-center">
-      <IconCircleCheck className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-      <Select value={status} onValueChange={setStatus}>
-        <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-primary focus:ring-primary w-full">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent className="rounded-xl">
-          <SelectItem
-            value="all"
-            className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
-          >
-            All
-          </SelectItem>
-          <SelectItem
-            value="active"
-            className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
-          >
-            Active
-          </SelectItem>
-          <SelectItem
-            value="inactive"
-            className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
-          >
-            Inactive
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+            {/* Category Select */}
+            <div className="relative flex-1 flex justify-center items-center">
+              <IconCategory className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              <Select value={category} onValueChange={(value) => setCategory(value === 'all' ? undefined : value)}>
+                <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-primary focus:ring-primary w-full">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem
+                    value="all"
+                    className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
+                  >
+                    All Categories
+                  </SelectItem>
+                  {allCategories.map((cat) => (
+                    <SelectItem
+                      key={cat}
+                      value={cat}
+                      className="capitalize rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
+                    >
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-    {/* Category Select */}
-    <div className="relative flex-1 flex justify-center items-center">
-      <IconCategory className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-      <Select value={category} onValueChange={setCategory}>
-        <SelectTrigger className="h-12 pl-12 py-[1.45rem] rounded-xl border-gray-200 focus:border-primary focus:ring-primary w-full">
-          <SelectValue placeholder="Category" />
-        </SelectTrigger>
-        <SelectContent className="rounded-xl">
-          <SelectItem
-            value="all"
-            className="rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
-          >
-            All
-          </SelectItem>
-          {categories.map(cat => (
-            <SelectItem
-              key={cat}
-              value={cat}
-              className="capitalize rounded-lg focus:bg-transparent hover:bg-transparent data-[highlighted]:bg-gray-50"
+            {/* Add Product */}
+            <Button
+              className="rounded-xl bg-gradient-to-r bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
+              onClick={() => {
+                setEditingProduct(null);
+                setOpen(true);
+              }}
             >
-              {cat}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-         </div>
-
-      {/* Add Product */}
-      <Button
-  className="rounded-xl bg-gradient-to-r bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
-  onClick={() => {
-    setEditingProduct(null);
-    setOpen(true);
-  }}
->
-  <IconPlus className="w-5 h-5 mr-2" />
-  Add New Product
-</Button>
-
+              <IconPlus className="w-5 h-5 mr-2" />
+              Add New Product
+            </Button>
           </div>
         </Card>
 
@@ -254,7 +253,7 @@ const AdminProducts = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table className='px-8'>
+              <Table className="px-8">
                 <TableHeader>
                   <TableRow className="bg-gray-50 hover:bg-gray-50 border-b-2">
                     <TableHead className="font-bold text-gray-700 py-4">
@@ -270,7 +269,7 @@ const AdminProducts = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {adminProducts.map(product => (
+                  {adminProducts.map((product) => (
                     <TableRow
                       key={product._id}
                       className="hover:bg-blue-50/50 transition-colors border-b"
@@ -319,11 +318,13 @@ const AdminProducts = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setToggleDialog({
-                              open: true,
-                              productId: product._id,
-                              isActive: product.isActive
-                            })}
+                            onClick={() =>
+                              setToggleDialog({
+                                open: true,
+                                productId: product._id,
+                                isActive: product.isActive,
+                              })
+                            }
                             className="hover:bg-amber-50 hover:text-amber-600 transition-colors"
                           >
                             {product.isActive ? (
@@ -335,10 +336,12 @@ const AdminProducts = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setDeleteDialog({
-                              open: true,
-                              productId: product._id
-                            })}
+                            onClick={() =>
+                              setDeleteDialog({
+                                open: true,
+                                productId: product._id,
+                              })
+                            }
                             className="hover:bg-red-50 hover:text-red-600 transition-colors"
                           >
                             <IconTrash className="w-4 h-4" />

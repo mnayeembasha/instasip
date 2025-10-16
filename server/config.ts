@@ -11,4 +11,5 @@ export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 export const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
+export const REDIS_URL = process.env.REDIS_URL;
 export const DEFAULT_PRODUCT_IMAGE = "https://via.placeholder.com/400x400/cccccc/ffffff?text=Product+Image";

@@ -5,7 +5,8 @@ import {
   IconBox,
   IconUser,
   IconShoppingCart,
-  IconLayoutDashboard
+  IconLayoutDashboard,
+  IconPhone
 } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 
@@ -109,6 +110,19 @@ const BottomNav = () => {
               )}
             </>
            {/* )} */}
+
+
+            <Link
+            to="/contact"
+            className={`flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all ${
+              isActive('/')
+                ? 'text-primary bg-primary/5'
+                : 'text-gray-600 hover:text-primary'
+            }`}
+          >
+            <IconPhone size={22} />
+            <span className="text-xs mt-1 font-medium">Contact</span>
+          </Link>
 
           {/* Cart */}
           <Link

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const images = [
   { link: 'hero3.jpg', position: 'object-center' },
@@ -31,18 +32,38 @@ const Hero: React.FC = () => {
     >
       {/* Content */}
       <div className="container mx-auto px-4 text-center pt-15 mb-12 ">
-        <h1 className=" text-5xl md:text-6xl 2xl:text-7xl mb-4 drop-shadow-lg tracking-tighter">
+        <motion.h1 
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-5xl md:text-6xl 2xl:text-7xl mb-4 drop-shadow-lg tracking-tighter"
+        >
           {/*Elevate Your Sips*/}
         Brew Less<span className="">.</span> Sip More<span className="">.</span>
-        </h1>
-        <p className="md:hidden text-xl md:text-xl 2xl:text-2xl mb-8 max-w-lg mx-auto opacity-95 drop-shadow-md">
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="md:hidden text-xl md:text-xl 2xl:text-2xl mb-8 max-w-lg mx-auto opacity-95 drop-shadow-md"
+        >
           {/*Where Tradition Meets Innovation in Every Effortless Brew*/}
    Experience instant aromatic freshness with eco-friendly tea cups, blending convenience with pure taste
-   </p>
-    <p className="hidden md:block text-xl md:text-xl 2xl:text-2xl mb-8 max-w-lg md:max-w-2xl mx-auto opacity-95 drop-shadow-md text-neutral-800">
+   </motion.p>
+    <motion.p 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+      className="hidden md:block text-xl md:text-xl 2xl:text-2xl mb-8 max-w-lg md:max-w-2xl mx-auto opacity-95 drop-shadow-md text-neutral-800"
+    >
           {/*Where Tradition Meets Innovation in Every Effortless Brew*/}
-Experience instant aromatic freshness with eco-friendly tea cups, blending convenience with pure taste and a touch of everyday mindful luxury   </p>
-        <div className="space-x-4">
+Experience instant aromatic freshness with eco-friendly tea cups, blending convenience with pure taste and a touch of everyday mindful luxury   </motion.p>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          className="space-x-4"
+        >
           <a
             href="/products"
             className="bg-primary text-white px-10 py-[0.85rem] rounded-full font-semibold hover:bg-white hover:text-primary transition-all duration-300 drop-shadow-lg"
@@ -55,7 +76,7 @@ Experience instant aromatic freshness with eco-friendly tea cups, blending conve
           >
             Learn More
           </a>
-        </div>
+        </motion.div>
       </div>
       
       {/* Mobile Slideshow */}

@@ -11,6 +11,7 @@ import cartRoutes from "./routes/cart.routes";
 import paymentRoutes from "./routes/payment.routes";
 import path from "path";
 import {connectDB} from "./lib/db";
+import {connectRedis} from "./lib/redisClient"
 
 const app = express();
 
@@ -68,11 +69,13 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Page Not Found" });
 });
 
-// app.listen(PORT, () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-//     connectDB();
-// });
-connectDB();
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    connectRedis();
+    connectDB();
+});
+//connectRedis();
+// connectDB();
 export default app;
 
 // if (process.env.NODE_DEPLOY !== "lambda") {

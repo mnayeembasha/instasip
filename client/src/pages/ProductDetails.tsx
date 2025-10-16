@@ -23,6 +23,7 @@ const ProductDetails = () => {
   const { user:currentUser } = useAppSelector((state) => state.auth);
   const { isAddingToCart } = useAppSelector((state) => state.cart);
 
+  const [quantityStr, setQuantityStr] = useState('1');
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -35,15 +36,41 @@ const ProductDetails = () => {
     };
   }, [slug, dispatch]);
 
+  useEffect(() => {
+    // Reset quantity when product changes
+    setQuantityStr('1');
+    setQuantity(1);
+  }, [currentProduct?._id]);
+
   const handleQuantityChange = (value: string) => {
+    setQuantityStr(value);
     const num = parseInt(value);
     if (!isNaN(num) && num > 0 && num <= (currentProduct?.stock || 0)) {
       setQuantity(num);
+    } else {
+      setQuantity(1); // Temporary placeholder for validation later
     }
+  };
+
+  const validateQuantity = (): boolean => {
+    if (!currentProduct) return false;
+    const num = parseInt(quantityStr);
+    if (isNaN(num) || num < 1) {
+      toast.error('Quantity must be at least 1');
+      return false;
+    }
+    if (num > currentProduct.stock) {
+      toast.error(`Only ${currentProduct.stock} units available in stock`);
+      return false;
+    }
+    setQuantity(num);
+    return true;
   };
 
   const handleAddToCart = async () => {
     if (!currentProduct) return;
+
+    if (!validateQuantity()) return;
 
     // Check if user is logged in
     if (!currentUser) {
@@ -67,6 +94,8 @@ const ProductDetails = () => {
 
   const handleBuyNow = async () => {
     if (!currentProduct) return;
+
+    if (!validateQuantity()) return;
 
     // Check if user is logged in
     if (!currentUser) {
@@ -200,11 +229,10 @@ const ProductDetails = () => {
                     </label>
                     <Input
                       id="quantity"
-                      type="number"
-                      min="1"
-                      max={currentProduct.stock}
-                      value={quantity}
-                      onChange={(e) => handleQuantityChange(e.target.value)}
+                      type="text" // Changed to text to allow leading zeros temporarily
+                      inputMode="numeric"
+                      value={quantityStr}
+                      onChange={(e) => handleQuantityChange(e.target.value.replace(/\D/g, '').replace(/^0+(\d)/, '$1') || '0')} // Strip non-digits, remove leading zeros unless zero
                       disabled={currentProduct.stock === 0 || isAddingToCart}
                       className="w-32 border-[#6D6154] focus:border-[#A86934] focus:ring-[#A86934]"
                     />

@@ -2,25 +2,22 @@ import { type Request, type Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie";
-
+import redisClient from "../lib/redisClient";
+import {clearProductCache} from "../utils/clearCache";
 
 export const register = async (req: Request, res: Response) => {
     try {
         const { name, phone, password } = req.body;
-
         const existingUser = await User.findOne({ phone });
         if (existingUser) {
             return res.status(400).json({ message: "User with this phone number already exists" });
         }
-
         const newUser = await User.create({
             name,
             phone,
             password,
         });
-
         generateTokenAndSetCookie(newUser._id.toString(), res);
-
         return res.status(201).json({
             message: "User registered successfully",
             user: {
@@ -44,14 +41,11 @@ export const login = async (req: Request, res: Response) => {
         if (!user) {
             return res.status(401).json({ message: "Invalid phone number or password" });
         }
-
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: "Invalid phone number or password" });
         }
-
         generateTokenAndSetCookie(user._id.toString(), res);
-
         return res.status(200).json({
             message: "Login successful",
             user: {
@@ -70,6 +64,11 @@ export const login = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
     try {
+        // Clear user cache on logout
+        if (req.user?._id) {
+            const cacheKey = `user:${req.user._id}`;
+            await redisClient.del(cacheKey);
+        }
         res.clearCookie("jwt");
         res.status(200).json({ message: "Logout successful" });
     } catch (error) {
@@ -81,7 +80,6 @@ export const logout = async (req: Request, res: Response) => {
 export const getMe = async (req: Request, res: Response) => {
     try {
         const user = req.user;
-
         return res.status(200).json({
             message: "User data fetched successfully",
             user: {

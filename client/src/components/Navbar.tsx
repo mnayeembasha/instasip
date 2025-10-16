@@ -9,7 +9,8 @@ import {
   IconBox,
   IconUser,
   IconUserPlus,
-  IconLayoutDashboard
+  IconLayoutDashboard,
+  IconPhone
 } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { logout } from '@/store/features/authSlice';
@@ -186,6 +187,8 @@ const Navbar = () => {
                             <span className="font-medium">Admin Panel</span>
                           </Link>
                         ) : (
+
+                        <div>
                           <Link
                             to="/profile"
                             onClick={handleLinkClick}
@@ -194,6 +197,16 @@ const Navbar = () => {
                             <IconUser size={20} />
                             <span className="font-medium">Profile</span>
                           </Link>
+                            
+                          <Link
+                            to="/contact"
+                            onClick={handleLinkClick}
+                            className="flex items-center gap-3 hover:text-primary hover:bg-primary/5 p-3 rounded-xl transition-all"
+                          >
+                            <IconPhone size={20} />
+                            <span className="font-medium">Contact</span>
+                          </Link>
+                          </div>
                         )}
 
                         <Button
@@ -223,6 +236,7 @@ const Navbar = () => {
                           <IconUserPlus size={20} />
                           <span className="font-medium">Signup</span>
                         </Link>
+                        
                       </>
                     )}
                   </div>

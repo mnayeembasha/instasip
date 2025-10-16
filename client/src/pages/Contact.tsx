@@ -27,7 +27,7 @@ const Contact = () => {
               {/* Phone Numbers */}
               <div>
                 <h3 className="font-semibold text-accent mb-3 flex items-center gap-2">
-                  <IconPhone className="w-5 h-5" />
+                  {/*<IconPhone className="w-5 h-5" />*/}
                   Phone Numbers
                 </h3>
                 <div className="space-y-3 ml-7">
@@ -55,7 +55,7 @@ const Contact = () => {
               {/* Email */}
               <div>
                 <h3 className="font-semibold text-accent mb-3 flex items-center gap-2">
-                  <IconMail className="w-5 h-5" />
+                  {/*<IconMail className="w-5 h-5" />*/}
                   Email
                 </h3>
                 <div className="ml-7">
@@ -74,7 +74,7 @@ const Contact = () => {
               {/* Social Media */}
               <div>
                 <h3 className="font-semibold text-accent mb-3 flex items-center gap-2">
-                  <IconBrandInstagram className="w-5 h-5" />
+                  {/*<IconBrandInstagram className="w-5 h-5" />*/}
                   Follow Us
                 </h3>
                 <div className="ml-7">
@@ -95,7 +95,7 @@ const Contact = () => {
               {/* Business Hours */}
               <div>
                 <h3 className="font-semibold text-accent mb-3 flex items-center gap-2">
-                  <IconClock className="w-5 h-5" />
+                  {/*<IconClock className="w-5 h-5" />*/}
                   Business Hours
                 </h3>
                 <div className="ml-7 space-y-2">
@@ -174,7 +174,7 @@ const Contact = () => {
         </div>
 
         {/* Additional Info Section */}
-        <Card className="mt-8 shadow-lg bg-gradient-to-r from-primary/5 to-accent/5">
+        <Card className="mt-8 shadow-lg bg-gradient-to-r from-primary/5 to-accent/5 mb-10 md:mb-0">
           <CardContent className="p-6 md:p-8">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-accent mb-3">Need Help?</h2>
@@ -182,7 +182,7 @@ const Contact = () => {
                 Our customer support team is ready to assist you with product inquiries,
                 bulk orders, or any questions you may have about our services.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="flex gap-4 justify-center items-center">
                 <a
                   href="tel:8074581961"
                   className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-accent transition-colors flex items-center gap-2"
