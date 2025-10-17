@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { IconPackage, IconTruck, IconCreditCard } from '@tabler/icons-react';
-import AdminProducts from './AdminProducts';
-import AdminOrders from './AdminOrders';
-import AdminPayments from './AdminPayments';
+import LoadingSpinner from '@/components/LoadingSpinner';
+const AdminProducts = lazy(() => import('./AdminProducts'));
+const AdminOrders = lazy(() => import('./AdminOrders'));
+const AdminPayments = lazy(() => import('./AdminPayments'));
 
 type TabType = 'orders' | 'products' | 'payments';
 
@@ -68,11 +69,13 @@ const Admin = () => {
         </div>
 
         {/* Content Section */}
+         <Suspense fallback={<div className="flex justify-center py-20"><LoadingSpinner /></div>}>
         <div className="animate-fade-in pb-20 md:pb-0">
           {activeTab === 'orders' && <AdminOrders />}
           {activeTab === 'products' && <AdminProducts />}
           {activeTab === 'payments' && <AdminPayments />}
         </div>
+        </Suspense>
       </div>
     </div>
   );
