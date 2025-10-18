@@ -2,7 +2,7 @@ import { type Request, type Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie";
-
+import {NODE_ENV} from "../config";
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -63,12 +63,11 @@ export const login = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
     try {
-        // Clear user cache on logout
-        // if (req.user?._id) {
-        //     const cacheKey = `user:${req.user._id}`;
-        //     await redisClient.del(cacheKey);
-        // }
-        res.clearCookie("jwt");
+        res.clearCookie("jwt", {
+          httpOnly: true,
+          secure: NODE_ENV === "production",
+          sameSite: NODE_ENV === "production" ? "none" : "lax",
+        });
         res.status(200).json({ message: "Logout successful" });
     } catch (error) {
         console.error("Error in logout controller", error);
