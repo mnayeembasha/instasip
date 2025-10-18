@@ -2,7 +2,6 @@ import { type Request, type Response, type NextFunction } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "../config";
 import { User } from "../models/User";
-import redisClient from "../lib/redisClient";
 
 interface CustomJWTPayload extends JwtPayload {
     userId?: string;
@@ -19,23 +18,10 @@ export const adminMiddleware = async (req: Request, res: Response, next: NextFun
             return res.status(401).json({ message: "Unauthorized - Invalid Token" });
         }
 
-        
-        const cacheKey = `user:${decodedData.userId}`;
-        
-        
-        const cachedUserData = await redisClient.get(cacheKey);
-        let user;
-        
-        if (cachedUserData) {
-            user = JSON.parse(cachedUserData);
-        } else {
-            user = await User.findById(decodedData.userId).select("-password");
-            if (!user) {
-                return res.status(401).json({ message: "Unauthorized - User Not Found" });
-            }
-            await redisClient.setEx(cacheKey, 180, JSON.stringify(user));
+        const user = await User.findById(decodedData.userId).select("-password");
+        if (!user) {
+            return res.status(401).json({ message: "Unauthorized - User Not Found" });
         }
-
         if (!user.isAdmin) {
             return res.status(403).json({ message: "Forbidden - Admin Access Required" });
         }

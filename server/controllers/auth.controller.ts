@@ -2,8 +2,7 @@ import { type Request, type Response } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie";
-import redisClient from "../lib/redisClient";
-import {clearProductCache} from "../utils/clearCache";
+
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -65,10 +64,10 @@ export const login = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
     try {
         // Clear user cache on logout
-        if (req.user?._id) {
-            const cacheKey = `user:${req.user._id}`;
-            await redisClient.del(cacheKey);
-        }
+        // if (req.user?._id) {
+        //     const cacheKey = `user:${req.user._id}`;
+        //     await redisClient.del(cacheKey);
+        // }
         res.clearCookie("jwt");
         res.status(200).json({ message: "Logout successful" });
     } catch (error) {

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { type CartItemType } from '@/types';
 import {BACKEND_URL} from '@/config';
 const API_URL = BACKEND_URL;
+import { logout } from './authSlice';
 
 interface CartState {
   items: CartItemType[];
@@ -189,9 +190,16 @@ const cartSlice = createSlice({
       .addCase(clearCart.rejected, (state, action) => {
         state.isClearingCart = false;
         state.error = action.payload as string;
+      })
+      // Handle logout from auth slice
+      .addCase(logout.fulfilled, (state) => {
+        state.items = [];
+        state.error = null;
       });
   },
 });
+
+
 
 export const { resetCartError } = cartSlice.actions;
 export default cartSlice.reducer;

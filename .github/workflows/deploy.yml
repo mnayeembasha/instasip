@@ -10,27 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      #  Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js (matches Lambda runtime)
+      #  Setup Node.js (matches Lambda runtime)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      # 3️⃣ Install dependencies in server folder
+      #  Install dependencies in server folder
       - name: Install dependencies
         working-directory: ./server
         run: npm ci
 
-      # 4️⃣ Build TypeScript project
+      #  Build TypeScript project
       - name: Build project
         working-directory: ./server
         run: npm run build
 
-      # 5️⃣ Prepare deployment zip (dist + node_modules at root)
+      #  Prepare deployment zip (dist + node_modules at root)
       - name: Zip deployment package
         working-directory: ./server
         run: |
@@ -43,7 +43,7 @@ jobs:
           cd ..
           rm -rf deploy_temp
 
-      # 6️⃣ Deploy to AWS Lambda
+      # Deploy to AWS Lambda
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@v0.1.9
         with:
@@ -67,4 +67,4 @@ jobs:
             --api-id qs1ohhx6q9 \
             --stage-name prod \
             --region $AWS_REGION
-          echo "✅ HTTP API Gateway redeployed successfully!"
+          echo " HTTP API Gateway redeployed successfully!"
