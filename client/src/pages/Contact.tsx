@@ -3,7 +3,7 @@ import { IconPhone, IconMail, IconBrandInstagram, IconMapPin, IconMessageCircle 
 
 const Contact = () => {
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-12">
+    <div className="min-h-screen bg-background pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -17,7 +17,7 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Information Card */}
           <Card className="shadow-lg border-t-4 border-primary">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-accent/10">
+            <CardHeader className="tracking-tighter">
               <CardTitle className="flex items-center gap-2 text-2xl">
                 <IconMessageCircle className="w-7 h-7 text-primary" />
                 Contact Information
@@ -114,13 +114,13 @@ const Contact = () => {
 
           {/* Location Card */}
           <Card className="shadow-lg border-t-4 border-accent">
-            <CardHeader className="bg-gradient-to-r from-accent/10 to-primary/10">
+            <CardHeader className="">
               <CardTitle className="flex items-center gap-2 text-2xl">
                 <IconMapPin className="w-7 h-7 text-accent" />
                 Visit Our Store
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-2">
               {/* Address */}
               <a
                 href="https://www.google.com/maps/search/?api=1&query=No+18/1,+13th+cross+Sahara+building,+Hongasandra+Begur+Main+Road,+Opp+Emerald+School,+Bangalore+560068"
@@ -130,9 +130,9 @@ const Contact = () => {
               >
                 <div className="bg-gradient-to-br from-accent/5 to-primary/5 rounded-lg p-6 hover:from-accent/10 hover:to-primary/10 transition-colors">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/30 transition-colors">
+                    {/*<div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/30 transition-colors">
                       <IconMapPin className="w-6 h-6 text-accent" />
-                    </div>
+                    </div>*/}
                     <div className="text-gray-700 leading-relaxed">
                       <p className="font-semibold text-accent mb-2">InstaSip Food & Beverages</p>
                       <p>No 18/1, 13th cross Sahara building,</p>

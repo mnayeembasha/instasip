@@ -4,6 +4,8 @@ export const registerZodSchema = z.object({
     name: z.string({ message: "Name is required" })
            .min(2, "Name should contain at least 2 characters")
            .max(50, "Name should not exceed 50 characters"),
+    email: z.string({ message: "Email is required" })
+           .email({message:"Email should be valid"}),
     phone: z.string({message:"Phone Number is required"})
             .regex(/^\d{10}$/, "Phone Number must be exactly 10 digits"),
     password: z.string({ message: "Password is required" })

@@ -5,7 +5,7 @@ const SustainablePackaging: React.FC = () => {
   return (
     <section className="relative py-20 bg-white">
       {/* Background Image */}
-      <div className="relative md:mx-20">
+      <div className="relative md:mx-8 lg:mx-20 xl:mx-28 2xl:mx-36">
         <img
           src="sustainable.png"
           alt="Sustainable Packaging"

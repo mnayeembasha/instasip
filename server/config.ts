@@ -12,4 +12,8 @@ export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 export const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
 export const REDIS_URL = process.env.REDIS_URL;
+export const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com';
+export const SMTP_PORT = process.env.SMTP_PORT || '587';
+export const SMTP_EMAIL = process.env.SMTP_EMAIL || '';
+export const SMTP_PASSWORD = process.env.SMTP_PASSWORD || '';
 export const DEFAULT_PRODUCT_IMAGE = "https://via.placeholder.com/400x400/cccccc/ffffff?text=Product+Image";

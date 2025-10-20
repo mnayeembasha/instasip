@@ -4,11 +4,13 @@ import bcrypt from 'bcryptjs';
 export interface UserDocument extends mongoose.Document {
     name: string;
     phone: string;
+    email: string;
     password: string;
     isAdmin: boolean;
-    isPhoneVerified: boolean;
-    // otp?: string;
-    // otpExpiresAt?: Date;
+    isEmailVerified: boolean;
+    verificationOtp?: string;
+    otpExpiresAt?: Date;
+    lastOtpSentAt?: Date; // For rate limiting
 }
 
 const userSchema = new mongoose.Schema<UserDocument>({
@@ -26,6 +28,13 @@ const userSchema = new mongoose.Schema<UserDocument>({
         trim: true,
         match: /^[+]?[\d\s-()]+$/
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    },
     password: {
         type: String,
         required: true,
@@ -35,27 +44,28 @@ const userSchema = new mongoose.Schema<UserDocument>({
         type: Boolean,
         default: false
     },
-    isPhoneVerified: {
+    isEmailVerified: {
         type: Boolean,
         default: false
     },
-    // otp: {
-    //     type: String,
-    //     select: false
-    // },
-    // otpExpiresAt: {
-    //     type: Date,
-    //     select: false
-    // }
+    verificationOtp: {
+        type: String,
+        select: false
+    },
+    otpExpiresAt: {
+        type: Date,
+        select: false
+    },
+    lastOtpSentAt: {
+        type: Date,
+        select: false
+    }
 }, {
     timestamps: true
 });
 
-userSchema.index({ phone: 1 });
-
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
-
     try {
         this.password = await bcrypt.hash(this.password, 12);
         next();
@@ -63,6 +73,5 @@ userSchema.pre('save', async function(next) {
         next(error);
     }
 });
-
 
 export const User = mongoose.model<UserDocument>("User", userSchema);

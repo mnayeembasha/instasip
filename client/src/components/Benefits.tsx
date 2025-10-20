@@ -11,10 +11,10 @@ const Benefits: React.FC = () => {
   ];
 
   return (
-    <section className="py-20">
+    <section className="py-12 md:py-20">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter text-center mb-12 text-primary">Key Benefits</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {benefits.map((benefit, idx) => (
             <div key={idx} className="relative rounded-lg overflow-hidden shadow-lg h-64 animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
               {/* Image */}

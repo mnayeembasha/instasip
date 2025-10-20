@@ -15,6 +15,7 @@ import ErrorMessage from '@/components/ErrorMessage';
 import type { RazorpayResponse } from '@/types';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '@/lib/axios';
+import CartEmpty from "@/components/CartEmpty";
 
 const addressSchema = z.object({
   street: z.string().min(1, 'Street is required'),
@@ -196,7 +197,7 @@ const Cart = () => {
   };
 
   if (isCheckingAuth || isFetchingCart) {
-    return <LoadingSpinner />;
+    return <div className="h-screen flex items-center justify-center"><LoadingSpinner /></div>;
   }
 
   if (!currentUser) {
@@ -205,7 +206,7 @@ const Cart = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 pt-20 md:pt-24 min-h-screen bg-background">
-      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center mt-6 md:mt-0">Your Cart</h1>
+      {items.length!==0?<h1 className="text-2xl md:text-4xl font-bold mb-6 text-center mt-6 md:mt-0 text-primary ">Your Cart</h1>:null}
 
       {cartError && (
         <div className="mb-4">
@@ -214,12 +215,7 @@ const Cart = () => {
       )}
 
       {items.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">Your cart is empty. Start shopping!</p>
-          <Button onClick={() => navigate('/products')} className="bg-primary text-white hover:bg-accent">
-            Browse Products
-          </Button>
-        </div>
+        <CartEmpty/>
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">

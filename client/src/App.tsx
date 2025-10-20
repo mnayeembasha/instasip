@@ -23,6 +23,7 @@ import InstasipBenefits from "./pages/InstasipBenefits";
 import NotFound from "./pages/NotFound";
 import YouAreOffline from "./pages/YouAreOffline";
 import useOffline from "./hooks/useOffline";
+
 import AOS from "aos";
 import "aos/dist/aos.css"; 
 
@@ -51,7 +52,7 @@ const AppContent = () => {
       // duration: 800, 
       easing: "ease-in-out", 
       once: false, // whether animation should happen only once
-      mirror: false, // whether elements should animate out while scrolling past them
+      mirror: true, // whether elements should animate out while scrolling past them
     });
   }, []);
 

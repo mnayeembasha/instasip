@@ -23,28 +23,32 @@ const BottomNav = () => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Show bottom nav when scrolling down on mobile
+      // Only apply scroll behavior on home page
       if (window.innerWidth < 1024) {
-        if (currentScrollY > 100) {
-          setIsVisible(true);
+        if (location.pathname === '/') {
+          // Show bottom nav when scrolled down on home page
+          if (currentScrollY > 100) {
+            setIsVisible(true);
+          } else {
+            setIsVisible(false);
+          }
         } else {
-          setIsVisible(false);
+          // Always visible on other pages
+          setIsVisible(true);
         }
       }
 
       setLastScrollY(currentScrollY);
     };
 
-    // Initial check
+    // Run initially
     handleScroll();
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, location.pathname]);
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <div
@@ -81,38 +85,34 @@ const BottomNav = () => {
           </Link>
 
           {/* Profile or Admin */}
-          {/* {user && ( */}
-            <>
-              {user && user.isAdmin ? (
-                <Link
-                  to="/admin"
-                  className={`flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all ${
-                    isActive('/admin')
-                      ? 'text-primary bg-primary/5'
-                      : 'text-gray-600 hover:text-primary'
-                  }`}
-                >
-                  <IconLayoutDashboard size={22} />
-                  <span className="text-xs mt-1 font-medium">Admin</span>
-                </Link>
-              ) : (
-                <Link
-                  to="/profile"
-                  className={`flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all ${
-                    isActive('/profile')
-                      ? 'text-primary bg-primary/5'
-                      : 'text-gray-600 hover:text-primary'
-                  }`}
-                >
-                  <IconUser size={22} />
-                  <span className="text-xs mt-1 font-medium">Profile</span>
-                </Link>
-              )}
-            </>
-           {/* )} */}
-
-
+          {user && user.isAdmin ? (
             <Link
+              to="/admin"
+              className={`flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all ${
+                isActive('/admin')
+                  ? 'text-primary bg-primary/5'
+                  : 'text-gray-600 hover:text-primary'
+              }`}
+            >
+              <IconLayoutDashboard size={22} />
+              <span className="text-xs mt-1 font-medium">Admin</span>
+            </Link>
+          ) : (
+            <Link
+              to="/profile"
+              className={`flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all ${
+                isActive('/profile')
+                  ? 'text-primary bg-primary/5'
+                  : 'text-gray-600 hover:text-primary'
+              }`}
+            >
+              <IconUser size={22} />
+              <span className="text-xs mt-1 font-medium">Profile</span>
+            </Link>
+          )}
+
+          {/* Contact */}
+          <Link
             to="/contact"
             className={`flex flex-col items-center justify-center flex-1 py-2 rounded-xl transition-all ${
               isActive('/contact')

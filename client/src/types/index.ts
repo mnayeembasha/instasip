@@ -2,8 +2,9 @@ export interface UserType {
   _id: string;
   name: string;
   phone: string;
+  email: string;
   isAdmin: boolean;
-  isPhoneVerified: boolean;
+  isEmailVerified: boolean;
 }
 
 export interface ProductType {

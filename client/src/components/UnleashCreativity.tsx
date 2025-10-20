@@ -14,7 +14,7 @@ const UnleashCreativity: React.FC = () => {
         </p>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-3 gap-4 md:gap-10">
           {/* Card 1 */}
           <div className="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500">
             <img

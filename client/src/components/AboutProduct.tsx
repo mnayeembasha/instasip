@@ -7,7 +7,7 @@ const AboutProduct: React.FC = () => {
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Heading & Description */}
         <div data-aos="fade-in" className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tighter font-bold text-primary mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl tracking-tighter md:font-bold text-primary mb-4">
             About Our Product
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl md:mx-auto text-left md:text-center">

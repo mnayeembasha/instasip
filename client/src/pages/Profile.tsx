@@ -10,6 +10,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
 import type { OrderType } from '@/types';
+import NotLoggedIn from "@/components/NotLoggedIn";
 
 const Profile = () => {
   const { user, isCheckingAuth } = useAppSelector((state) => state.auth);
@@ -74,25 +75,7 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background p-4 pt-20">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <div className="flex justify-center mb-4">
-              <IconUser className="w-16 h-16 text-gray-400" />
-            </div>
-            <CardTitle className="text-2xl">You are not Logged In</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-gray-600">Please log in to view your profile and orders</p>
-            <Button
-              onClick={() => navigate('/login?redirect=/profile')}
-              className="w-full bg-primary text-white hover:bg-accent"
-            >
-              Login to Continue
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <NotLoggedIn/>
     );
   }
 
