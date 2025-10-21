@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { IconPackage, IconTruck, IconCircleCheck, IconX, IconClock, IconInfoCircle } from '@tabler/icons-react';
+import { Loader2 } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
@@ -36,6 +37,7 @@ const AdminOrders = () => {
   });
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.isAdmin) navigate('/');
@@ -54,13 +56,18 @@ const AdminOrders = () => {
 
   const handleStatusConfirm = () => {
     if (statusDialog.orderId && statusDialog.newStatus) {
+      setUpdatingOrderId(statusDialog.orderId);
       dispatch(updateOrderStatus({
         id: statusDialog.orderId,
         status: statusDialog.newStatus
       })).then(() => {
         dispatch(fetchAdminOrders({ status: statusFilter !== 'all' ? statusFilter : undefined }));
+        setUpdatingOrderId(null);
+        setStatusDialog({ open: false, orderId: null, newStatus: null, currentStatus: null });
+      }).catch(() => {
+        setUpdatingOrderId(null);
+        setStatusDialog({ open: false, orderId: null, newStatus: null, currentStatus: null });
       });
-      setStatusDialog({ open: false, orderId: null, newStatus: null, currentStatus: null });
     }
   };
 
@@ -204,34 +211,41 @@ const AdminOrders = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Select
-                          value={order.status}
-                          onValueChange={(newStatus) => handleStatusChange(order._id, order.status, newStatus)}
-                        >
-                          <SelectTrigger className="w-[160px] h-10 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-xl">
-                            <SelectItem value="pending" className="rounded-lg cursor-pointer">
-                              Pending
-                            </SelectItem>
-                            <SelectItem value="confirmed" className="rounded-lg cursor-pointer">
-                              Confirmed
-                            </SelectItem>
-                            <SelectItem value="processing" className="rounded-lg cursor-pointer">
-                              Processing
-                            </SelectItem>
-                            <SelectItem value="shipped" className="rounded-lg cursor-pointer">
-                              Shipped
-                            </SelectItem>
-                            <SelectItem value="delivered" className="rounded-lg cursor-pointer">
-                              Delivered
-                            </SelectItem>
-                            <SelectItem value="cancelled" className="rounded-lg cursor-pointer">
-                              Cancelled
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
+                        {updatingOrderId === order._id ? (
+                          <div className="flex items-center gap-2 w-[160px] h-10 px-3 rounded-lg border border-gray-200 bg-gray-50">
+                            <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                            <span className="text-sm text-gray-600">Updating...</span>
+                          </div>
+                        ) : (
+                          <Select
+                            value={order.status}
+                            onValueChange={(newStatus) => handleStatusChange(order._id, order.status, newStatus)}
+                          >
+                            <SelectTrigger className="w-[160px] h-10 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-xl">
+                              <SelectItem value="pending" className="rounded-lg cursor-pointer">
+                                Pending
+                              </SelectItem>
+                              <SelectItem value="confirmed" className="rounded-lg cursor-pointer">
+                                Confirmed
+                              </SelectItem>
+                              <SelectItem value="processing" className="rounded-lg cursor-pointer">
+                                Processing
+                              </SelectItem>
+                              <SelectItem value="shipped" className="rounded-lg cursor-pointer">
+                                Shipped
+                              </SelectItem>
+                              <SelectItem value="delivered" className="rounded-lg cursor-pointer">
+                                Delivered
+                              </SelectItem>
+                              <SelectItem value="cancelled" className="rounded-lg cursor-pointer">
+                                Cancelled
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
                       </TableCell>
                       <TableCell>
   <Badge className={`capitalize ${getPaymentStatusColor(order.paymentStatus)}`}>
@@ -260,7 +274,11 @@ const AdminOrders = () => {
         {/* Status Update Confirmation Dialog */}
         <AlertDialog
           open={statusDialog.open}
-          onOpenChange={(open) => setStatusDialog({ open, orderId: null, newStatus: null, currentStatus: null })}
+          onOpenChange={(open) => {
+            if (!updatingOrderId) {
+              setStatusDialog({ open, orderId: null, newStatus: null, currentStatus: null });
+            }
+          }}
         >
           <AlertDialogContent className="max-w-md">
             <AlertDialogHeader>
@@ -275,12 +293,22 @@ const AdminOrders = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-2 sm:gap-2">
-              <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="mt-0" disabled={updatingOrderId !== null}>
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleStatusConfirm}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={updatingOrderId !== null}
+                className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Update Status
+                {updatingOrderId ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Updating...</span>
+                  </div>
+                ) : (
+                  'Update Status'
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
