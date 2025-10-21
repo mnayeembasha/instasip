@@ -13,6 +13,10 @@ const transporter = nodemailer.createTransport({
     tls: {
         rejectUnauthorized: NODE_ENV === "development" ? false : true,
     },
+    pool: true,
+    connectionTimeout: 10000,
+    greetingTimeout: 8000,
+    socketTimeout: 10000
 });
 
 export const sendVerificationOtp = async (email: string, otp: string, name: string) => {
