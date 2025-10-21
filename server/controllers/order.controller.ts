@@ -189,12 +189,20 @@ export const createOrder = async (req: Request, res: Response) => {
       .populate("items.product") as PopulatedOrderDocument | null;
 
     // Send order confirmation email (non-blocking)
+    // if (req.user?.email && populatedOrder) {
+    //   sendOrderConfirmationEmail(
+    //     req.user.email,
+    //     req.user.name,
+    //     populatedOrder
+    //   ).catch(err => console.error('Failed to send order confirmation email:', err));
+    // }
+
     if (req.user?.email && populatedOrder) {
-      sendOrderConfirmationEmail(
+      await sendOrderConfirmationEmail(
         req.user.email,
         req.user.name,
         populatedOrder
-      ).catch(err => console.error('Failed to send order confirmation email:', err));
+      );
     }
 
     // Remove sensitive data before sending response
@@ -402,21 +410,28 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
 
     // Send delivered email when status is changed to 'delivered'
+    // if (status === 'delivered' && updatedOrder.user) {
+    //   const user = updatedOrder.user as UserDocument;
+    //   if (user.email) {
+    //     // Fetch the complete order with signature for email
+    //     const completeOrder = await Order.findById(orderId)
+    //       .populate('user', '-password')
+    //       .populate('items.product') as PopulatedOrderDocument | null;
+        
+    //     if (completeOrder) {
+    //       sendOrderDeliveredEmail(
+    //         user.email,
+    //         user.name,
+    //         completeOrder
+    //       ).catch(err => console.error('Failed to send order delivered email:', err));
+    //     }
+    //   }
+    // }
+
     if (status === 'delivered' && updatedOrder.user) {
       const user = updatedOrder.user as UserDocument;
-      if (user.email) {
-        // Fetch the complete order with signature for email
-        const completeOrder = await Order.findById(orderId)
-          .populate('user', '-password')
-          .populate('items.product') as PopulatedOrderDocument | null;
-        
-        if (completeOrder) {
-          sendOrderDeliveredEmail(
-            user.email,
-            user.name,
-            completeOrder
-          ).catch(err => console.error('Failed to send order delivered email:', err));
-        }
+      if (user.email && updatedOrder) {
+        await sendOrderDeliveredEmail(user.email, user.name, updatedOrder);
       }
     }
 
