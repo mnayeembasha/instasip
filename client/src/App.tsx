@@ -23,6 +23,7 @@ import InstasipBenefits from "./pages/InstasipBenefits";
 import NotFound from "./pages/NotFound";
 import YouAreOffline from "./pages/YouAreOffline";
 import useOffline from "./hooks/useOffline";
+import Test from "@/components/Test";
 
 import AOS from "aos";
 import "aos/dist/aos.css"; 
@@ -87,6 +88,7 @@ const AppContent = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/benefits" element={<InstasipBenefits />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/test" element={<Test/>}/>
           <Route path="*" element={<NotFound />} />
 
           {/* Protected routes */}

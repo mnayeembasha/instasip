@@ -69,11 +69,11 @@ app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Page Not Found" });
 });
 
-// app.listen(PORT, () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-//     connectRedis();
-//     connectDB();
-// });
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+    connectRedis();
+    connectDB();
+});
 //connectRedis();
 // connectDB();
 export default app;

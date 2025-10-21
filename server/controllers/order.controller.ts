@@ -2,13 +2,15 @@ import { type Request, type Response } from "express";
 import { Order, type OrderDocument } from "../models/Order";
 import { Product } from "../models/Product";
 import { Payment } from "../models/Payment";
+import { type UserDocument } from "../models/User";
 import mongoose from "mongoose";
 import { validateObjectId } from "../utils/validateObjectId";
 import { Cart } from "../models/Cart";
 import crypto from "crypto";
 import { RAZORPAY_KEY_SECRET } from "../config";
 import {razorpay} from "./payment.controller";
-
+import {sendOrderConfirmationEmail,sendOrderDeliveredEmail} from "../services/emailService";
+import type { PopulatedOrderDocument } from "../templates/emailTemplates";
 
 const ID_ERROR_MESSAGE = 'Invalid Order ID';
 
@@ -47,11 +49,9 @@ export const validateAndPrepareItem = async (
   };
 };
 
-
 export const createOrder = async (req: Request, res: Response) => {
   const { items, shippingAddress, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
   const userId = req.user?._id;
-
 
   // Check if payment already exists
     const existingPayment = await Payment.findOne({ 
@@ -111,7 +111,6 @@ export const createOrder = async (req: Request, res: Response) => {
         });
     }
 
-
   // Start MongoDB transaction
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -165,7 +164,16 @@ export const createOrder = async (req: Request, res: Response) => {
     // Populate order for response
     const populatedOrder = await Order.findById(createdOrder._id)
       .populate("user", "-password")
-      .populate("items.product");
+      .populate("items.product") as PopulatedOrderDocument | null;
+
+    // Send order confirmation email (non-blocking)
+    if (req.user?.email && populatedOrder) {
+      sendOrderConfirmationEmail(
+        req.user.email,
+        req.user.name,
+        populatedOrder
+      ).catch(err => console.error('Failed to send order confirmation email:', err));
+    }
 
     return res.status(201).json({ message: "Order placed successfully", order: populatedOrder });
   } catch (error: unknown) {
@@ -353,10 +361,22 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
             orderId,
             updateData,
             { new: true }
-        ).populate('user', '-password').populate('items.product');
+        ).populate('user', '-password').populate('items.product') as PopulatedOrderDocument | null;
 
         if (!updatedOrder) {
             return res.status(404).json({ message: "Order not found" });
+        }
+
+        // Send delivered email when status is changed to 'delivered'
+        if (status === 'delivered' && updatedOrder.user) {
+            const user = updatedOrder.user as UserDocument;
+            if (user.email) {
+                sendOrderDeliveredEmail(
+                    user.email,
+                    user.name,
+                    updatedOrder
+                ).catch(err => console.error('Failed to send order delivered email:', err));
+            }
         }
 
         return res.status(200).json({

@@ -5,9 +5,9 @@ export interface UserDocument extends mongoose.Document {
     name: string;
     phone: string;
     email: string;
+    isEmailVerified: boolean;
     password: string;
     isAdmin: boolean;
-    isEmailVerified: boolean;
     verificationOtp?: string;
     otpExpiresAt?: Date;
     lastOtpSentAt?: Date; // For rate limiting
