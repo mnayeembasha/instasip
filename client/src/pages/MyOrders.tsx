@@ -12,7 +12,6 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import {
-  IconUser,
   IconPhone,
   IconShoppingBag,
   IconTruckDelivery,

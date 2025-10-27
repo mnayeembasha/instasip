@@ -46,6 +46,7 @@ export interface OrderType {
   user: UserType | string;
   items: OrderItemType[];
   totalAmount: number;
+  subtotal:number;
   gstAmount: number;
   gstPercentage: number;
   deliveryCharge: number;

@@ -3,14 +3,12 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchAllPayments, fetchPaymentStats } from '@/store/features/paymentSlice';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
   IconCreditCard,
-  IconCircleCheck,
-  IconX,
   IconRefresh,
   IconInfoCircle,
 } from '@tabler/icons-react';

@@ -3,12 +3,12 @@ import {Link} from "react-router-dom";
 
 interface HomeProductCardProps {
   name: string;
-  price: string;
+  // price?: string;
   image: string;
   link:string;
 }
 
-const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, price, image,link }) => {
+const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, image,link }) => {
   return (
     <div data-aos="fade-in" className="relative rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300 animate-fade-in-up">
       {/* Product Image */}
