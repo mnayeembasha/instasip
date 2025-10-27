@@ -9,6 +9,10 @@ export interface OrderItemDocument {
 export interface OrderDocument extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
     items: OrderItemDocument[];
+    subtotal: number;
+    gstAmount: number;
+    gstPercentage: number;
+    deliveryCharge: number;
     totalAmount: number;
     status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     shippingAddress: {
@@ -51,6 +55,27 @@ const orderSchema = new mongoose.Schema<OrderDocument>({
         required: true
     },
     items: [orderItemSchema],
+    subtotal: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    gstAmount: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    gstPercentage: {
+        type: Number,
+        required: true,
+        default: 5
+    },
+    deliveryCharge: {
+        type: Number,
+        required: true,
+        min: 0,
+        default: 0
+    },
     totalAmount: {
         type: Number,
         required: true,

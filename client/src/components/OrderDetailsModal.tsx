@@ -147,16 +147,44 @@ const OrderDetailsModal = ({ open, onOpenChange, order }: OrderDetailsModalProps
 
           <Separator className="my-4" />
 
-          {/* Order Summary */}
+          {/* Payment Summary */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <IconCreditCard className="w-5 h-5 text-amber-600" />
               <h3 className="font-semibold text-base">Payment Summary</h3>
             </div>
             <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 border-2 border-amber-200">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-700 font-medium">Total Amount</span>
-                <span className="font-bold text-2xl text-amber-700">&#8377;{order.totalAmount.toFixed(2)}</span>
+              <div className="space-y-2">
+                {order.subtotal && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="font-semibold">₹{order.subtotal.toFixed(2)}</span>
+                  </div>
+                )}
+                {order.gstPercentage !== undefined && order.gstAmount !== undefined && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">GST ({order.gstPercentage}%):</span>
+                    <span className="font-semibold">₹{order.gstAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                {order.deliveryCharge !== undefined && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Delivery Charge:</span>
+                    <span className="font-semibold">
+                      {order.deliveryCharge === 0 ? (
+                        <span className="text-green-600">FREE</span>
+                      ) : (
+                        `₹${order.deliveryCharge.toFixed(2)}`
+                      )}
+                    </span>
+                  </div>
+                )}
+                <div className="border-t pt-2 flex justify-between">
+                  <span className="font-bold text-lg">Total Amount:</span>
+                  <span className="font-bold text-lg text-amber-700">
+                    ₹{order.totalAmount.toFixed(2)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

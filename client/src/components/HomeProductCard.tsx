@@ -20,9 +20,9 @@ const HomeProductCard: React.FC<HomeProductCardProps> = ({ name, price, image,li
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
         <h3 className="text-lg tracking-tight mb-1">{name}</h3>
-        <p className="text-xl font-bold mb-3" style={{ color: "#E7A873" }}>
+        {/*<p className="text-xl font-bold mb-3" style={{ color: "#E7A873" }}>
           {price}
-        </p>
+        </p>*/}
         <Link to={link}>
           <button
             className="w-full py-2 bg-gray-200/20 text-white rounded-full transition-colors cursor-pointer"

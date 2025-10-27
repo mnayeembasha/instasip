@@ -9,10 +9,28 @@ import { Cart } from "../models/Cart";
 import crypto from "crypto";
 import { RAZORPAY_KEY_SECRET } from "../config";
 import { razorpay } from "./payment.controller";
-import { sendOrderConfirmationEmail, sendOrderDeliveredEmail } from "../services/emailService";
+import { sendOrderConfirmationEmail, sendOrderDeliveredEmail } from "../services/emailService"; 
 import type { PopulatedOrderDocument } from "../templates/emailTemplates";
 
 const ID_ERROR_MESSAGE = 'Invalid Order ID';
+const GST_PERCENTAGE = 5;
+const DELIVERY_CHARGE = 50;
+const FREE_DELIVERY_THRESHOLD = 600;
+
+// Helper function to calculate order amounts
+export const calculateOrderAmounts = (subtotal: number) => {
+  const gstAmount = (subtotal * GST_PERCENTAGE) / 100;
+  const deliveryCharge = subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_CHARGE : 0;
+  const totalAmount = subtotal + gstAmount + deliveryCharge;
+  
+  return {
+    subtotal,
+    gstAmount: Number(gstAmount.toFixed(2)),
+    gstPercentage: GST_PERCENTAGE,
+    deliveryCharge,
+    totalAmount: Number(totalAmount.toFixed(2))
+  };
+};
 
 // Helper function to remove sensitive fields from order
 const sanitizeOrder = (order: any) => {
@@ -109,20 +127,22 @@ export const createOrder = async (req: Request, res: Response) => {
     const razorpayOrder = await razorpay.orders.fetch(razorpayOrderId);
     
     // Calculate expected total from products
-    let calculatedTotal = 0;
+    let calculatedSubtotal = 0;
     for (const item of items) {
       const product = await Product.findById(item.product);
       if (!product) {
         throw new Error(`Product not found: ${item.product}`);
       }
-      calculatedTotal += product.price * item.quantity;
+      calculatedSubtotal += product.price * item.quantity;
     }
     
+    // Calculate amounts with GST and delivery
+    const amounts = calculateOrderAmounts(calculatedSubtotal);
     const razorpayAmount: number = Number(razorpayOrder.amount) / 100; // Convert paise to rupees
     
-    if (Math.abs(calculatedTotal - razorpayAmount) > 0.01) { // Allow 1 paisa difference for rounding
+    if (Math.abs(amounts.totalAmount - razorpayAmount) > 0.01) { // Allow 1 paisa difference for rounding
       throw new Error(
-        `Amount mismatch. Calculated: ₹${calculatedTotal}, Paid: ₹${razorpayAmount}`
+        `Amount mismatch. Calculated: ₹${amounts.totalAmount}, Paid: ₹${razorpayAmount}`
       );
     }
   } catch (error: any) {
@@ -138,21 +158,28 @@ export const createOrder = async (req: Request, res: Response) => {
   session.startTransaction();
 
   try {
-    let totalAmount = 0;
+    let subtotal = 0;
     const orderItems = [];
 
     // Process each item with transaction-safe stock deduction
     for (const item of items) {
       const preparedItem = await validateAndPrepareItem(item, session);
-      totalAmount += preparedItem.total;
+      subtotal += preparedItem.total;
       orderItems.push(preparedItem);
     }
+
+    // Calculate amounts with GST and delivery
+    const amounts = calculateOrderAmounts(subtotal);
 
     // Create order
     const [createdOrder] = await Order.create([{
       user: userId,
       items: orderItems,
-      totalAmount,
+      subtotal: amounts.subtotal,
+      gstAmount: amounts.gstAmount,
+      gstPercentage: amounts.gstPercentage,
+      deliveryCharge: amounts.deliveryCharge,
+      totalAmount: amounts.totalAmount,
       shippingAddress,
       status: 'confirmed',
       paymentStatus: 'paid',
@@ -170,7 +197,7 @@ export const createOrder = async (req: Request, res: Response) => {
       razorpayOrderId,
       razorpayPaymentId,
       razorpaySignature,
-      amount: totalAmount,
+      amount: amounts.totalAmount,
       currency: 'INR',
       status: 'captured',
       contact: req.user?.phone
@@ -188,16 +215,17 @@ export const createOrder = async (req: Request, res: Response) => {
       .populate("user", "-password")
       .populate("items.product") as PopulatedOrderDocument | null;
 
-    // Send order confirmation email (non-blocking)
-    // if (req.user?.email && populatedOrder) {
-    //   sendOrderConfirmationEmail(
-    //     req.user.email,
-    //     req.user.name,
-    //     populatedOrder
-    //   ).catch(err => console.error('Failed to send order confirmation email:', err));
-    // }
-
+    // Send order confirmation email
     if (req.user?.email && populatedOrder) {
+
+      //todo: send mail to admin
+      // await sendOrderConfirmationEmail(
+      //   req.user.email,
+      //   req.user.name,
+      //   populatedOrder
+      // );
+
+
       await sendOrderConfirmationEmail(
         req.user.email,
         req.user.name,
@@ -356,25 +384,63 @@ export const cancelOrder = async (req: Request, res: Response) => {
 // Admin Controllers
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
-    const { status, userId } = req.query;
+    const { status, userId, startDate, endDate, search } = req.query;
 
-    const filter: Record<string, string> = {};
-    if (status && status !== 'all') filter.status = status as string;
-    if (userId) filter.user = userId as string;
+    const filter: Record<string, any> = {};
+
+    // Status filter
+    if (status && status !== 'all') {
+      filter.status = status as string;
+    }
+
+    // User ID filter
+    if (userId) {
+      filter.user = userId as string;
+    }
+
+    // Date range filter
+    if (startDate || endDate) {
+      filter.orderDate = {};
+      if (startDate) {
+        filter.orderDate.$gte = new Date(startDate as string);
+      }
+      if (endDate) {
+        // Set end date to end of the day
+        const end = new Date(endDate as string);
+        end.setHours(23, 59, 59, 999);
+        filter.orderDate.$lte = end;
+      }
+    }
+
+    // Search filter (by user name or phone)
+    if (search) {
+      const searchRegex = new RegExp(search as string, 'i'); // Case-insensitive search
+      filter.$or = [
+        { 'user.name': searchRegex },
+        { 'user.phone': searchRegex }
+      ];
+    }
 
     const orders = await Order.find(filter)
       .select('-razorpaySignature')
-      .populate('user', '-password')
+      .populate({
+        path: 'user',
+        select: '-password',
+        match: search ? { $or: [{ name: new RegExp(search as string, 'i') }, { phone: new RegExp(search as string, 'i') }] } : {}
+      })
       .populate('items.product')
       .sort({ createdAt: -1 });
 
+    // Filter out null users (in case the user doesn't match the search criteria)
+    const filteredOrders = orders.filter(order => order.user !== null);
+
     return res.status(200).json({
-      message: "Orders fetched successfully",
-      orders
+      message: 'Orders fetched successfully',
+      orders: filteredOrders
     });
   } catch (error) {
-    console.error("Error in getAllOrders controller", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error('Error in getAllOrders controller', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
@@ -410,24 +476,6 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
 
     // Send delivered email when status is changed to 'delivered'
-    // if (status === 'delivered' && updatedOrder.user) {
-    //   const user = updatedOrder.user as UserDocument;
-    //   if (user.email) {
-    //     // Fetch the complete order with signature for email
-    //     const completeOrder = await Order.findById(orderId)
-    //       .populate('user', '-password')
-    //       .populate('items.product') as PopulatedOrderDocument | null;
-        
-    //     if (completeOrder) {
-    //       sendOrderDeliveredEmail(
-    //         user.email,
-    //         user.name,
-    //         completeOrder
-    //       ).catch(err => console.error('Failed to send order delivered email:', err));
-    //     }
-    //   }
-    // }
-
     if (status === 'delivered' && updatedOrder.user) {
       const user = updatedOrder.user as UserDocument;
       if (user.email && updatedOrder) {

@@ -46,6 +46,9 @@ export interface OrderType {
   user: UserType | string;
   items: OrderItemType[];
   totalAmount: number;
+  gstAmount: number;
+  gstPercentage: number;
+  deliveryCharge: number;
   status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: ShippingAddressType;
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';

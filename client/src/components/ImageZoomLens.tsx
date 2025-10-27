@@ -4,6 +4,7 @@ interface ImageZoomLensProps {
   src: string;
   alt: string;
   className?: string;
+  isFirstImage?: boolean;
 }
 
 interface Position {
@@ -18,7 +19,7 @@ interface ImageDimensions {
   offsetY: number;
 }
 
-const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '' }) => {
+const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '', isFirstImage = false }) => {
   const [showLens, setShowLens] = useState<boolean>(false);
   const [lensPosition, setLensPosition] = useState<Position>({ x: 0, y: 0 });
   const [zoomPosition, setZoomPosition] = useState<Position>({ x: 0, y: 0 });
@@ -101,6 +102,9 @@ const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '' 
     calculateImageDimensions();
   };
 
+  // Determine the object-fit class based on whether it's the first image and screen size
+  const objectFitClass = isFirstImage ? 'object-cover md:object-contain' : 'object-contain';
+
   return (
     <div
       ref={containerRef}
@@ -113,7 +117,7 @@ const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '' 
         ref={imgRef}
         src={src}
         alt={alt}
-        className="max-w-full max-h-full object-contain rounded-xl"
+        className={`max-w-full max-h-full ${objectFitClass} rounded-md md:rounded-xl`}
         onLoad={handleImageLoad}
       />
 
@@ -128,8 +132,7 @@ const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '' 
             top: `${lensPosition.y}px`,
             backgroundImage: `url(${src})`,
             backgroundSize: `${(imgDimensions.width * zoomLevel)}px ${(imgDimensions.height * zoomLevel)}px`,
-            // backgroundPosition: `${-(zoomPosition.x / 100 * imgDimensions.width * zoomLevel - lensSize / 2 + imgDimensions.offsetX * (zoomLevel - 1))}px ${-(zoomPosition.y / 100 * imgDimensions.height * zoomLevel - lensSize / 2 + imgDimensions.offsetY * (zoomLevel - 1))}px`,
-                        backgroundPosition: `${-(zoomPosition.x / 100 * imgDimensions.width * zoomLevel - lensSize / 2)}px ${-(zoomPosition.y / 100 * imgDimensions.height * zoomLevel - lensSize / 2)}px`,
+            backgroundPosition: `${-(zoomPosition.x / 100 * imgDimensions.width * zoomLevel - lensSize / 2)}px ${-(zoomPosition.y / 100 * imgDimensions.height * zoomLevel - lensSize / 2)}px`,
             backgroundRepeat: 'no-repeat',
             opacity: 0.98,
             transition: 'opacity 0.15s ease-out',

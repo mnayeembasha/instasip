@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchAdminOrders, updateOrderStatus } from '@/store/features/orderSlice';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -6,12 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { IconPackage, IconTruck, IconCircleCheck, IconX, IconClock, IconInfoCircle } from '@tabler/icons-react';
+import { IconPackage, IconTruck, IconCircleCheck, IconX, IconClock, IconInfoCircle, IconRefresh, IconDownload, IconEye } from '@tabler/icons-react';
 import { Loader2 } from 'lucide-react';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import OrderDetailsModal from '@/components/OrderDetailsModal';
+import InvoiceModal from '@/components/InvoiceModal';
 import { useNavigate } from 'react-router-dom';
 import type { UserType, OrderType } from '@/types';
 
@@ -29,6 +31,9 @@ const AdminOrders = () => {
   const navigate = useNavigate();
 
   const [statusFilter, setStatusFilter] = useState('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [statusDialog, setStatusDialog] = useState<StatusUpdate>({
     open: false,
     orderId: null,
@@ -37,12 +42,30 @@ const AdminOrders = () => {
   });
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
+  const fetchOrders = useCallback(() => {
+    const params: Record<string, string> = {};
+    if (statusFilter !== 'all') params.status = statusFilter;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (searchTerm) params.search = searchTerm;
+
+    dispatch(fetchAdminOrders(params));
+  }, [dispatch, statusFilter, startDate, endDate, searchTerm]);
+
   useEffect(() => {
-    if (!user?.isAdmin) navigate('/');
-    else dispatch(fetchAdminOrders({ status: statusFilter !== 'all' ? statusFilter : undefined }));
-  }, [statusFilter, user, dispatch, navigate]);
+    if (!user?.isAdmin) {
+      navigate('/');
+    } else {
+      fetchOrders();
+    }
+  }, [user?.isAdmin, navigate, fetchOrders]);
+
+  const handleRefresh = () => {
+    fetchOrders();
+  };
 
   const handleStatusChange = (orderId: string, currentStatus: string, newStatus: string) => {
     if (newStatus === currentStatus) return;
@@ -61,7 +84,7 @@ const AdminOrders = () => {
         id: statusDialog.orderId,
         status: statusDialog.newStatus
       })).then(() => {
-        dispatch(fetchAdminOrders({ status: statusFilter !== 'all' ? statusFilter : undefined }));
+        fetchOrders();
         setUpdatingOrderId(null);
         setStatusDialog({ open: false, orderId: null, newStatus: null, currentStatus: null });
       }).catch(() => {
@@ -76,15 +99,26 @@ const AdminOrders = () => {
     setDetailsModalOpen(true);
   };
 
-  const getPaymentStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    paid: 'bg-green-100 text-green-700 border-green-200',
-    failed: 'bg-red-100 text-red-700 border-red-200',
-    refunded: 'bg-blue-100 text-blue-700 border-blue-200'
+  const handleViewInvoice = (order: OrderType) => {
+    setSelectedOrder(order);
+    setInvoiceModalOpen(true);
   };
-  return colors[status] || 'bg-gray-100 text-gray-700 border-gray-200';
-};
+
+  const handleDownloadInvoice = (order: OrderType) => {
+    import('@/utils/invoiceUtils').then(({ generateInvoicePDF }) => {
+      generateInvoicePDF(order);
+    });
+  };
+
+  const getPaymentStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      paid: 'bg-green-100 text-green-700 border-green-200',
+      failed: 'bg-red-100 text-red-700 border-red-200',
+      refunded: 'bg-blue-100 text-blue-700 border-blue-200'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-700 border-gray-200';
+  };
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -117,30 +151,34 @@ const AdminOrders = () => {
     }
   };
 
+  const filteredOrders = adminOrders.filter(order => {
+    const userName = (order.user as UserType)?.name?.toLowerCase() || '';
+    const userPhone = (order.user as UserType)?.phone || '';
+    const search = searchTerm.toLowerCase();
+
+    return userName.includes(search) || userPhone.includes(search);
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        {/* Header Section */}
-        {/* <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3 tracking-tight">
-                <IconTruck className="w-8 h-8 text-primary" />
-                Order Management
-              </h1>
-              <p className="text-gray-600">Track and manage customer orders</p>
-            </div>
-          </div>
-        </div> */}
-
         {/* Filter Section */}
-        <Card className="mb-8 p-6 border-0 bg-white">
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
-            <div className="relative flex-1 max-w-xs">
-              <IconCircleCheck className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
+        <Card className="mb-8 p-6 border-0 bg-white shadow-md">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Search</label>
+              <Input
+                placeholder="Search by name or phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-10"
+              />
+            </div>
+
+            <div className="w-full lg:w-48">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-12 pl-12 rounded-xl border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-gray-50 hover:bg-white transition-all">
+                <SelectTrigger className="h-10 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl">
@@ -153,6 +191,37 @@ const AdminOrders = () => {
                   <SelectItem value="cancelled" className="rounded-lg cursor-pointer">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="w-full lg:w-48">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Start Date</label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="h-10"
+              />
+            </div>
+
+            <div className="w-full lg:w-48">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">End Date</label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="h-10"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <Button
+                onClick={handleRefresh}
+                variant="outline"
+                className="h-10 px-4"
+              >
+                <IconRefresh className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
             </div>
           </div>
         </Card>
@@ -167,7 +236,7 @@ const AdminOrders = () => {
             <div className="p-8">
               <ErrorMessage message={error} />
             </div>
-          ) : adminOrders.length === 0 ? (
+          ) : filteredOrders.length === 0 ? (
             <div className="p-12 text-center">
               <IconPackage className="w-16 h-16 mx-auto text-gray-300 mb-4" />
               <p className="text-gray-600 text-lg font-medium">No orders found</p>
@@ -187,11 +256,11 @@ const AdminOrders = () => {
                     <TableHead className="font-bold text-gray-700">Update Status</TableHead>
                     <TableHead className="font-bold text-gray-700">Payment Status</TableHead>
                     <TableHead className="font-bold text-gray-700">Info</TableHead>
-
+                    <TableHead className="font-bold text-gray-700">Invoice</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {adminOrders.map(order => (
+                  {filteredOrders.map(order => (
                     <TableRow
                       key={order._id}
                       className="hover:bg-blue-50/50 transition-colors border-b"
@@ -199,8 +268,15 @@ const AdminOrders = () => {
                       <TableCell className="font-medium text-gray-900 py-4">
                         <span className="font-mono text-sm">{order._id.slice(-8)}</span>
                       </TableCell>
-                      <TableCell className="font-medium text-gray-700">
-                        {(order.user as UserType).name}
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {(order.user as UserType).name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {(order.user as UserType).phone}
+                          </p>
+                        </div>
                       </TableCell>
                       <TableCell className="font-semibold text-gray-900">
                         &#8377;{order.totalAmount.toFixed(2)}
@@ -248,11 +324,10 @@ const AdminOrders = () => {
                         )}
                       </TableCell>
                       <TableCell>
-  <Badge className={`capitalize ${getPaymentStatusColor(order.paymentStatus)}`}>
-    {order.paymentStatus}
-  </Badge>
-</TableCell>
-
+                        <Badge className={`capitalize ${getPaymentStatusColor(order.paymentStatus)}`}>
+                          {order.paymentStatus}
+                        </Badge>
+                      </TableCell>
                       <TableCell>
                         <Button
                           variant="ghost"
@@ -262,6 +337,28 @@ const AdminOrders = () => {
                         >
                           <IconInfoCircle className="w-5 h-5 text-blue-600" />
                         </Button>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleViewInvoice(order)}
+                            className="hover:bg-blue-50"
+                            title="View Invoice"
+                          >
+                            <IconEye className="w-5 h-5 text-blue-600" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDownloadInvoice(order)}
+                            className="hover:bg-blue-50"
+                            title="Download Invoice"
+                          >
+                            <IconDownload className="w-5 h-5 text-blue-600" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -318,6 +415,13 @@ const AdminOrders = () => {
         <OrderDetailsModal
           open={detailsModalOpen}
           onOpenChange={setDetailsModalOpen}
+          order={selectedOrder}
+        />
+
+        {/* Invoice Modal */}
+        <InvoiceModal
+          open={invoiceModalOpen}
+          onOpenChange={setInvoiceModalOpen}
           order={selectedOrder}
         />
       </div>

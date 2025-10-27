@@ -121,7 +121,7 @@ const Navbar = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-md"
+                  className="bg-gradient-to-b from-primary to-[var(--color-primary)]/70  text-white hover:opacity-90 px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-md"
                 >
                   <IconUser size={18} />
                   Login

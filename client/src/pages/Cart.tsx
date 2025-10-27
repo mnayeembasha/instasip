@@ -25,6 +25,10 @@ const addressSchema = z.object({
   country: z.string().default('India'),
 });
 
+const GST_PERCENTAGE = 5;
+const DELIVERY_CHARGE = 50;
+const FREE_DELIVERY_THRESHOLD = 600;
+
 const Cart = () => {
   const { items, isFetchingCart, isUpdatingCart, error: cartError } = useAppSelector((state) => state.cart);
   const { user: currentUser, isCheckingAuth } = useAppSelector((state) => state.auth);
@@ -65,7 +69,11 @@ const Cart = () => {
     };
   }, []);
 
-  const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  // Calculate amounts
+  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const gstAmount = Number(((subtotal * GST_PERCENTAGE) / 100).toFixed(2));
+  const deliveryCharge = subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_CHARGE : 0;
+  const total = Number((subtotal + gstAmount + deliveryCharge).toFixed(2));
 
   const handleQuantityChange = async (productId: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -136,7 +144,7 @@ const Cart = () => {
     setIsProcessingPayment(true);
 
     try {
-      // Create Razorpay order
+      // Create Razorpay order with total amount (including GST and delivery)
       const orderRes = await axiosInstance.post('/payment/create-order', {
         amount: total,
       });
@@ -152,6 +160,9 @@ const Cart = () => {
         order_id: orderId,
         handler: async (response: RazorpayResponse) => {
           try {
+            // Show loader with "Placing order..." message
+            toast.loading('Placing order, this may take a few seconds...', { duration: Infinity });
+            
             // Create order after successful payment
             await dispatch(createOrder({
               items: items.map((i) => ({ product: i.product._id, quantity: i.quantity })),
@@ -162,9 +173,11 @@ const Cart = () => {
             })).unwrap();
 
             await dispatch(clearCart()).unwrap();
+            toast.dismiss(); // Remove the loading toast
             toast.success('Order placed successfully!');
             navigate('/profile');
           } catch (error) {
+            toast.dismiss(); // Remove the loading toast
             if (error instanceof Error) {
               toast.error(error.message || 'Failed to place order');
             }
@@ -206,7 +219,7 @@ const Cart = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 pt-20 md:pt-24 min-h-screen bg-background">
-      {items.length!==0?<h1 className="text-2xl md:text-4xl font-bold mb-6 text-center mt-6 md:mt-0 text-primary ">Your Cart</h1>:null}
+      {items.length !== 0 ? <h1 className="text-2xl md:text-4xl font-bold mb-6 text-center mt-6 md:mt-0 text-primary">Your Cart</h1> : null}
 
       {cartError && (
         <div className="mb-4">
@@ -215,7 +228,7 @@ const Cart = () => {
       )}
 
       {items.length === 0 ? (
-        <CartEmpty/>
+        <CartEmpty />
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -237,6 +250,7 @@ const Cart = () => {
                       </p>
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                         <div className="flex items-center gap-2">
+                          <p className="text-neutral-600">No of Packs : </p>
                           <Button
                             variant="outline"
                             size="sm"
@@ -283,9 +297,28 @@ const Cart = () => {
                 <CardContent>
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Items ({items.length}):</span>
-                      <span className="font-semibold">&#8377;{total.toFixed(2)}</span>
+                      <span className="text-gray-600">Subtotal ({items.length} items):</span>
+                      <span className="font-semibold">&#8377;{subtotal.toFixed(2)}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">GST ({GST_PERCENTAGE}%):</span>
+                      <span className="font-semibold">&#8377;{gstAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Delivery Charge:</span>
+                      <span className="font-semibold">
+                        {deliveryCharge === 0 ? (
+                          <span className="text-green-600">FREE</span>
+                        ) : (
+                          `₹${deliveryCharge.toFixed(2)}`
+                        )}
+                      </span>
+                    </div>
+                    {subtotal < FREE_DELIVERY_THRESHOLD && (
+                      <div className="text-xs text-orange-600 bg-orange-50 p-2 rounded">
+                        Add ₹{(FREE_DELIVERY_THRESHOLD - subtotal).toFixed(2)} more for free delivery!
+                      </div>
+                    )}
                     <div className="border-t pt-2 mt-2">
                       <div className="flex justify-between">
                         <span className="font-bold text-lg">Total:</span>
@@ -296,14 +329,15 @@ const Cart = () => {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                     <p className="text-xs text-blue-800">
                       <strong>Note:</strong> We currently accept prepaid orders only for a secure shopping experience.
-                      If you face any issues, please contact our support team.
+                      If you face any issues, please contact our support team. <br /><br />
+                      <p>At present, we are accepting orders only from locations near bangalore.</p>
                     </p>
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleProceedToCheckout)} className="space-y-4 w-full">
-                      <div className="text-sm font-semibold mb-2">Shipping Address</div>
+                      <div className="text-sm font-semibold mb-2">Delivery Address</div>
                       <FormField
                         name="street"
                         render={({ field }) => (
@@ -367,10 +401,21 @@ const Cart = () => {
                       />
                       <Button
                         type="submit"
-                        disabled={isCreatingOrder || isProcessingPayment || items.length === 0}
-                        className="w-full bg-primary text-white hover:bg-accent"
+                        disabled={items.length === 0}
+                        className={`w-full text-white flex items-center justify-center gap-2 ${
+                          isProcessingPayment || isCreatingOrder
+                            ? 'bg-accent hover:bg-accent'
+                            : 'bg-primary hover:bg-accent'
+                        }`}
                       >
-                        {isProcessingPayment || isCreatingOrder ? <LoadingSpinner /> : 'Proceed to Checkout'}
+                        {(isProcessingPayment || isCreatingOrder) ? (
+                          <>
+                            <LoadingSpinner />
+                            <span>Proceeding to Checkout...</span>
+                          </>
+                        ) : (
+                          'Proceed to Checkout'
+                        )}
                       </Button>
                     </form>
                   </Form>

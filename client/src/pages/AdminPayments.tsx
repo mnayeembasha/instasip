@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import type { PaymentType, UserType } from '@/types';
 
 const AdminPayments = () => {
-  const { payments, stats, isFetchingPayments, error } = useAppSelector((state) => state.payment);
+  const { payments, isFetchingPayments, error } = useAppSelector((state) => state.payment);
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const AdminPayments = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         {/* Stats Cards */}
-        {stats && (
+        {/*{stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="border-0 shadow-md bg-white">
               <CardHeader className="pb-2">
@@ -144,7 +144,7 @@ const AdminPayments = () => {
               </CardContent>
             </Card>
           </div>
-        )}
+        )}*/}
 
         {/* Filters Section */}
         <Card className="mb-8 p-6 border-0 bg-white shadow-md">
