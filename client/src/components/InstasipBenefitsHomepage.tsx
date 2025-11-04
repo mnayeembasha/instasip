@@ -70,7 +70,7 @@ const InstasipBenefitsHomepage = () => {
         {/* Header */}
         <div data-aos="fade-in" className="text-center mb-20">
           <div className="inline-block px-4 py-2 rounded-full mb-4" style={{ backgroundColor: '#A86934', color: 'white' }}>
-            <span className="text-sm font-semibold tracking-wide">REVOLUTIONIZING TEA</span>
+            <span className="text-sm font-semibold tracking-wide">ENJOY TEA AT ITS BEST</span>
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 tracking-tighter leading-tight text-primary md:font-bold">
             Why Instasip is Different

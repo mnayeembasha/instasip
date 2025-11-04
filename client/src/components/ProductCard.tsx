@@ -105,7 +105,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           >
             <Minus className="h-4 w-4 text-[#4D301A]" />
           </Button>
-          <span className="w-15 text-center text-sm font-medium text-[#4D301A]">{quantity} pack{quantity > 1 ? 's' : ''}</span>
+          <span className="w-15 text-center text-sm font-medium text-[#4D301A] font-manrope">{quantity} pack{quantity > 1 ? 's' : ''}</span>
           <Button
             variant="outline"
             size="sm"

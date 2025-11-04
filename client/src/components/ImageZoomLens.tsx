@@ -103,7 +103,8 @@ const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '',
   };
 
   // Determine the object-fit class based on whether it's the first image and screen size
-  const objectFitClass = isFirstImage ? 'object-cover md:object-contain' : 'object-contain';
+  const objectFitClass = isFirstImage ? 'object-cover' : 'object-contain';
+  // const objectFitClass="object-cover";
 
   return (
     <div
@@ -117,7 +118,7 @@ const ImageZoomLens: React.FC<ImageZoomLensProps> = ({ src, alt, className = '',
         ref={imgRef}
         src={src}
         alt={alt}
-        className={`max-w-full max-h-full ${objectFitClass} rounded-md md:rounded-xl`}
+        className={`max-w-full max-h-full ${objectFitClass} w-350 md:h-400 rounded-md md:rounded-xl`}
         onLoad={handleImageLoad}
       />
 
