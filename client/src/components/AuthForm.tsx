@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login, sendRegistrationOtp } from '@/store/features/authSlice';
-import { Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { VerifyEmailForm } from './VerifyEmailForm';
 
 interface AuthFormProps {
@@ -48,6 +48,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const redirect = searchParams.get('redirect') || '/';
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<AuthFormData>({
     resolver: zodResolver(type === 'login' ? loginSchema : signupSchema),
@@ -165,7 +166,24 @@ const AuthForm = ({ type }: AuthFormProps) => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" {...field} placeholder="Enter your password" />
+                <div className="relative">
+                  <Input 
+                    type={showPassword ? "text" : "password"} 
+                    {...field} 
+                    placeholder="Enter your password" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
