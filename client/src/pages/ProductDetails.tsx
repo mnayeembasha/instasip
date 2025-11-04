@@ -237,7 +237,7 @@ const ProductDetails = () => {
                         size="sm"
                         onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
                         disabled={currentProduct.stock === 0 || isAddingToCart || quantity <= 1}
-                        className="w-10 h-10 rounded-lg border-[#6D6154]"
+                        className="w-10 h-10 rounded-lg border-[#6D6154] hover:bg-[same-color] cursor-pointer"
                       >
                         <Minus className="h-5 w-5 text-[#4D301A]" />
                       </Button>
@@ -249,9 +249,9 @@ const ProductDetails = () => {
                         size="sm"
                         onClick={() => setQuantity((prev) => prev + 1)}
                         disabled={currentProduct.stock === 0 || isAddingToCart || quantity * packSize >= currentProduct.stock}
-                        className="w-10 h-10 rounded-lg border-[#6D6154]"
+                        className="w-10 h-10 rounded-lg border-[#6D6154] hover:bg-[same-color] cursor-pointer"
                       >
-                        <Plus className="h-5 w-5 text-[#4D301A]" />
+                        <Plus className="h-5 w-5 text-[#4D301A] " />
                       </Button>
                     </div>
                   </div>

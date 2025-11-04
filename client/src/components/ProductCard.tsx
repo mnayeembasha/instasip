@@ -101,7 +101,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             size="sm"
             onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
             disabled={product.stock === 0 || isAdding || quantity <= 1}
-            className="w-8 h-8 rounded-lg border-[#6D6154]"
+            className="w-8 h-8 rounded-lg border-[#6D6154] hover:bg-[same-color] cursor-pointer"
           >
             <Minus className="h-4 w-4 text-[#4D301A]" />
           </Button>
@@ -111,7 +111,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             size="sm"
             onClick={() => setQuantity((prev) => prev + 1)}
             disabled={product.stock === 0 || isAdding || quantity * packSize >= product.stock}
-            className="w-8 h-8 rounded-lg border-[#6D6154]"
+            className="w-8 h-8 rounded-lg border-[#6D6154] hover:bg-[same-color] cursor-pointer"
           >
             <Plus className="h-4 w-4 text-[#4D301A]" />
           </Button>
