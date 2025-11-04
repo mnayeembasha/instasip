@@ -13,13 +13,13 @@ html,body{
 }*/
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/*@custom-variant dark (&:is(.dark *));*/
 :root {
 /*  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;*/
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+/*  color-scheme: light dark;*/
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -85,7 +85,7 @@ html,body{
   .text-accent-cool { color: var(--text-accent-cool); }
 }
 
-@media (prefers-color-scheme: light) {
+/*@media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
@@ -96,7 +96,7 @@ html,body{
   button {
     background-color: #f9f9f9;
   }
-}
+}*/
 
 @theme inline {
 
