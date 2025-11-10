@@ -66,7 +66,7 @@ Experience instant aromatic freshness with eco-friendly tea cups, blending conve
         >
           <a
             href="/products"
-            className="bg-primary text-white px-10 py-[0.85rem] rounded-full font-semibold hover:bg-white hover:text-primary transition-all duration-300 drop-shadow-lg"
+            className="bg-primary text-white px-10 py-[0.85rem] rounded-full font-semibold hover:bg-accent transition-all duration-300 drop-shadow-lg"
           >
             Shop Now
           </a>

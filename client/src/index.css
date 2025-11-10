@@ -70,7 +70,7 @@ html,body{
   --text-secondary-muted: #E5E5E5; /* Muted secondary text */
   --text-tertiary: #D1D1D1;        /* Hints / disabled text */
   --text-tertiary-muted: #BFBFBF;  /* Placeholder / very subtle text */
-  --text-accent-warm: #FFD9B3;     /* Warm highlights */
+/*  --text-accent-warm: #FFD9B3;     /*
   --text-accent-cool: #88C4E6;     /* Cool highlights (links, buttons) */
 
 }
@@ -230,3 +230,15 @@ body {
 .animate-pulse { animation: pulse 2s infinite; }
 
 
+.edit-icon:hover{
+  background-color: #ebf8ff;
+}
+.inactive-icon:hover{
+  background-color: #fef9c3;
+}
+.delete-icon:hover{
+  background-color: #fff5f5;
+}
+.logout-icon:hover{
+  background-color: rgba(168, 105, 52, 0.05);
+}

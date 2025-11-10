@@ -15,26 +15,22 @@ import ProductForm from '@/components/ProductForm';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { type ProductType } from '@/types';
-
 interface Filter {
   status?: string;
   category?: string;
   search?: string;
 }
-
 const AdminProducts = () => {
   const { adminProducts, isFetchingAdminProducts, isAddingProduct, isEditingProduct, error } = useAppSelector((state) => state.product);
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
   const [status, setStatus] = useState<string | undefined>(undefined);
   const [category, setCategory] = useState<string | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
   const [allCategories, setAllCategories] = useState<string[]>([]);
-
   // Alert dialog states
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; productId: string | null }>({
     open: false,
@@ -45,7 +41,6 @@ const AdminProducts = () => {
     productId: null,
     isActive: false,
   });
-
   // Fetch all categories on initial load
   useEffect(() => {
     if (!user?.isAdmin) {
@@ -59,7 +54,6 @@ const AdminProducts = () => {
       });
     }
   }, [dispatch, user, navigate]);
-
   useEffect(() => {
     if (user?.isAdmin) {
       const filters: Filter = {};
@@ -69,7 +63,6 @@ const AdminProducts = () => {
       dispatch(fetchAdminProducts(filters));
     }
   }, [status, category, search, user, dispatch]);
-
   const handleSubmit = (data: unknown) => {
     if (editingProduct) {
       dispatch(editProduct({ id: editingProduct._id, data: data as ProductType })).then(() => {
@@ -80,12 +73,10 @@ const AdminProducts = () => {
       dispatch(addProduct(data as ProductType)).then(() => setOpen(false));
     }
   };
-
   const handleEdit = (product: ProductType) => {
     setEditingProduct(product);
     setOpen(true);
   };
-
   const handleDeleteConfirm = () => {
     if (deleteDialog.productId) {
       dispatch(deleteProduct(deleteDialog.productId)).then(() => {
@@ -99,7 +90,6 @@ const AdminProducts = () => {
       setDeleteDialog({ open: false, productId: null });
     }
   };
-
   const handleToggleConfirm = () => {
     if (toggleDialog.productId) {
       dispatch(toggleProductStatus({
@@ -109,12 +99,10 @@ const AdminProducts = () => {
       setToggleDialog({ open: false, productId: null, isActive: false });
     }
   };
-
   const handleDialogClose = () => {
     setOpen(false);
     setEditingProduct(null);
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
@@ -147,7 +135,6 @@ const AdminProducts = () => {
             </Dialog>
           </div>
         </div>
-
         {/* Filters Section */}
         <Card className="mb-8 p-6 border-0 bg-white">
           <div className="flex flex-col md:flex-row gap-4">
@@ -161,7 +148,6 @@ const AdminProducts = () => {
                 className="pl-12 h-12 rounded-xl border-gray-200 focus:border-primary focus:ring-primary transition-all"
               />
             </div>
-
             {/* Status Select */}
             <div className="relative flex-1 flex justify-center items-center">
               <IconCircleCheck className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -191,7 +177,6 @@ const AdminProducts = () => {
                 </SelectContent>
               </Select>
             </div>
-
             {/* Category Select */}
             <div className="relative flex-1 flex justify-center items-center">
               <IconCategory className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
@@ -218,7 +203,6 @@ const AdminProducts = () => {
                 </SelectContent>
               </Select>
             </div>
-
             {/* Add Product */}
             <Button
               className="rounded-xl bg-gradient-to-r bg-accent text-white shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
@@ -232,7 +216,6 @@ const AdminProducts = () => {
             </Button>
           </div>
         </Card>
-
         {/* Products Table */}
         <Card className="shadow-md border-0 overflow-hidden bg-white">
           {isFetchingAdminProducts ? (
@@ -311,7 +294,7 @@ const AdminProducts = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(product)}
-                            className="hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                            className="hover:bg-blue-50 hover:text-blue-600 transition-colors edit-icon"
                           >
                             <IconEdit className="w-4 h-4" />
                           </Button>
@@ -325,7 +308,7 @@ const AdminProducts = () => {
                                 isActive: product.isActive,
                               })
                             }
-                            className="hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                            className="hover:bg-amber-50 hover:text-amber-600 transition-colors inactive-icon"
                           >
                             {product.isActive ? (
                               <IconEyeOff className="w-4 h-4" />
@@ -342,7 +325,7 @@ const AdminProducts = () => {
                                 productId: product._id,
                               })
                             }
-                            className="hover:bg-red-50 hover:text-red-600 transition-colors"
+                            className="hover:bg-red-50 hover:text-red-600 transition-colors delete-icon"
                           >
                             <IconTrash className="w-4 h-4" />
                           </Button>
@@ -355,7 +338,6 @@ const AdminProducts = () => {
             </div>
           )}
         </Card>
-
         {/* Delete Confirmation Dialog */}
         <AlertDialog
           open={deleteDialog.open}
@@ -383,7 +365,6 @@ const AdminProducts = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
         {/* Toggle Status Confirmation Dialog */}
         <AlertDialog
           open={toggleDialog.open}
@@ -423,5 +404,4 @@ const AdminProducts = () => {
     </div>
   );
 };
-
 export default AdminProducts;

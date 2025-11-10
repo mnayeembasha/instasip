@@ -6,7 +6,6 @@ export interface UserType {
   isAdmin: boolean;
   isEmailVerified: boolean;
 }
-
 export interface ProductType {
   _id: string;
   name: string;
@@ -19,20 +18,18 @@ export interface ProductType {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  images: string[];
 }
-
 export interface CartItemType {
   product: ProductType;
   quantity: number;
 }
-
 export interface OrderItemType {
   _id: string;
   product: ProductType;
   quantity: number;
   price: number;
 }
-
 export interface ShippingAddressType {
   street: string;
   city: string;
@@ -40,7 +37,6 @@ export interface ShippingAddressType {
   zipCode: string;
   country: string;
 }
-
 export interface OrderType {
   _id: string;
   user: UserType | string;
@@ -55,13 +51,12 @@ export interface OrderType {
   paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
   razorpayOrderId: string;
   razorpayPaymentId: string;
-//  razorpaySignature: string;
+// razorpaySignature: string;
   orderDate: string;
   deliveredAt?: string;
   createdAt: string;
   updatedAt: string;
 }
-
 export interface CartType {
   _id: string;
   user: string;
@@ -69,7 +64,6 @@ export interface CartType {
   createdAt: string;
   updatedAt: string;
 }
-
 export interface PaymentType {
   _id: string;
   user: UserType;
@@ -91,7 +85,6 @@ export interface PaymentType {
   createdAt: string;
   updatedAt: string;
 }
-
 export interface PaymentStatsType {
   totalPayments: number;
   totalAmount: number;
@@ -101,7 +94,6 @@ export interface PaymentStatsType {
   refundedPayments: number;
   refundedAmount: number;
 }
-
 export interface DailyStatsType {
   date: string;
   transactions: number;
@@ -109,7 +101,6 @@ export interface DailyStatsType {
   successful: number;
   failed: number;
 }
-
 export interface RazorpayOptions {
   key: string;
   amount: number;
@@ -126,13 +117,11 @@ export interface RazorpayOptions {
     color: string;
   };
 }
-
 export interface RazorpayResponse {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
 }
-
 declare global {
   interface Window {
     Razorpay: {

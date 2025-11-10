@@ -41,8 +41,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: '7mb' }));
-app.use(express.urlencoded({ extended: true, limit: '7mb' }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 app.use(cookieParser());
 
 const stagePrefix = '/prod'; // can also use process.env.API_STAGE
@@ -81,13 +81,3 @@ if(NODE_ENV === "development"){
 }
 
 export default app;
-
-// if (process.env.NODE_DEPLOY !== "lambda") {
-//   const PORT = process.env.PORT;
-//   import("./lib/db").then(({ connectDB }) => {
-//     app.listen(PORT, () => {
-//       console.log(`Server running on http://localhost:${PORT}`);
-//       connectDB();
-//     });
-//   });
-// }

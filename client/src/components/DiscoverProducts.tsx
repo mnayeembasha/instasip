@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import HomeProductCard from './HomeProductCard';
 
 const preMixProducts = [
-  { name: 'Masala Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487448/instasip/lkjopeknfhhx3vfce6ap.jpg',link:"/products/masala-tea" },
-  { name: 'Coffee', price: '₹25', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487431/instasip/n67g3hlumuutxtrq96hw.jpg',link:"/products/coffee" },
-  { name: 'Lemon Tea', price: '₹18', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487405/instasip/i7vacfkhpncjmibufu5l.jpg',link:"/products/lemon-tea" }
+  { name: 'Masala Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487448/instasip/lkjopeknfhhx3vfce6ap.jpg',link:"/products/masala-tea" },
+  { name: 'Coffee', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487431/instasip/n67g3hlumuutxtrq96hw.jpg',link:"/products/coffee" },
+  { name: 'Lemon Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1759487405/instasip/i7vacfkhpncjmibufu5l.jpg',link:"/products/lemon-tea" }
 ];
 
 const greenTeaProducts = [
-  { name: 'Pomegranate Flavoured Green Tea', price: '₹22', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536304/instasip/fjdz2k2irdp2jgvw4uco.jpg',link:"/products/pomegranate-flavoured-green-tea" },
-  { name: 'Mint Flavoured Green Tea', price: '₹20', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536282/instasip/tmt6iezplgclvbxi8ot0.png',link:"/products/mint-flavoured-green-tea" },
-  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹24', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536260/instasip/hi0hbv8o0dx9azlvwebh.png',link:"/products/ginger-lemon-flavoured-green-tea" }
+  { name: 'Pomegranate Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536304/instasip/fjdz2k2irdp2jgvw4uco.jpg',link:"/products/pomegranate-flavoured-green-tea" },
+  { name: 'Mint Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536282/instasip/tmt6iezplgclvbxi8ot0.png',link:"/products/mint-flavoured-green-tea" },
+  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536260/instasip/hi0hbv8o0dx9azlvwebh.png',link:"/products/ginger-lemon-flavoured-green-tea" }
 ];
 
 // Combine products for "All"

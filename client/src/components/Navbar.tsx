@@ -112,7 +112,7 @@ const Navbar = () => {
                   <Button
                     variant="ghost"
                     onClick={handleLogout}
-                    className="text-gray-700 hover:text-primary hover:bg-primary/5 px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 h-auto"
+                    className="text-gray-700 hover:text-primary logout-icon px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-2 h-auto"
                   >
                     <IconLogout size={18} />
                     Logout

@@ -2,7 +2,7 @@ import React from 'react';
 
 const WhyChooseUs: React.FC = () => {
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4 max-w-5xl text-center">
         <h2 className="text-4xl md:text-5xl lg:text-6xl md:font-bold tracking-tighter mb-6 md:mb-12 text-primary">Why Choose InstaSip?</h2>
         <p className="text-lg mb-16 text-gray-700 text-left md:text-center">
