@@ -188,88 +188,120 @@ export const createProduct = async (req: Request, res: Response) => {
     }
 };
 export const updateProduct = async (req: Request, res: Response) => {
-    const productId = req.params.id;
-    if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) return;
-    try {
-        const { name, price, description, stock, category, images = [] } = req.body;
-        const existingProduct = await Product.findById(productId);
-        if (!existingProduct) {
-            return res.status(404).json({ message: "Product not found" });
-        }
-        const updateData: Partial<ProductDocument> = {
-            name,
-            price,
-            description,
-            stock,
-            category
-        };
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-        let newImages: string[] = [];
-        let newPublicIds: string[] = [];
-        let toDeletePublicIds = [...existingProduct.imagesPublicIds];
-        for (const img of images) {
-            if (img.startsWith('data:image/')) {
-                const mimeType = img.split(';')[0].split(':')[1];
-                if (!allowedTypes.includes(mimeType)) {
-                    return res.status(400).json({ message: 'Invalid image format' });
-                }
-                const base64Data = img.split(';base64,').pop() || '';
-                const buffer = Buffer.from(base64Data, 'base64');
-                if (buffer.length > 5 * 1024 * 1024) {
-                    return res.status(400).json({ message: 'Image size exceeds 5MB' });
-                }
-                const uploadResult = await cloudinary.uploader.upload(img, {
-                    resource_type: 'image',
-                    folder: 'instasip',
-                });
-                newImages.push(uploadResult.secure_url);
-                newPublicIds.push(uploadResult.public_id);
-            } else if (img.startsWith('http') || img.startsWith('https')) {
-                const index = existingProduct.images.findIndex((existingImg) => existingImg === img);
-                if (index !== -1) {
-                    newImages.push(img);
-                    newPublicIds.push(existingProduct.imagesPublicIds[index]);
-                    toDeletePublicIds = toDeletePublicIds.filter((_, i) => i !== index);
-                }
-            }
-        }
-        for (const pid of toDeletePublicIds) {
-            if (pid) {
-                try {
-                    await cloudinary.uploader.destroy(pid);
-                    console.log('Image deleted from Cloudinary:', pid);
-                } catch (deleteError) {
-                    console.error('Error deleting image from Cloudinary:', deleteError);
-                }
-            }
-        }
-        updateData.images = newImages;
-        updateData.imagesPublicIds = newPublicIds;
-        if (newImages.length > 0) {
-            updateData.image = newImages[0];
-            updateData.imagePublicId = newPublicIds[0];
-        } else {
-            updateData.image = DEFAULT_PRODUCT_IMAGE;
-            updateData.imagePublicId = '';
-        }
-        const updatedProduct = await Product.findByIdAndUpdate(
-            productId,
-            updateData,
-            { new: true, runValidators: true }
-        );
-        if (!updatedProduct) {
-            return res.status(404).json({ message: "Product not found" });
-        }
-        // Clear product cache after update
-        await clearProductCache();
-        return res.status(200).json({
-            message: "Product updated successfully",
-            product: updatedProduct
-        });
-    } catch (error) {
-        console.error("Error in updateProduct controller", error);
-        res.status(500).json({ message: "Internal Server Error" });
+  const productId = req.params.id;
+  
+  if (!validateObjectId(productId as string, ID_ERROR_MESSAGE, res)) return;
+
+  try {
+    const { name, price, description, stock, category, images = [] } = req.body;
+
+    const existingProduct = await Product.findById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({ message: "Product not found" });
     }
+
+    const updateData: Partial<ProductDocument> = {
+      name,
+      price,
+      description,
+      stock,
+      category
+    };
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    const newImages: string[] = [];
+    const newPublicIds: string[] = [];
+    
+    // Track existing URLs that are being kept
+    const keptUrls = new Set<string>();
+
+    // Process each image in the payload
+    for (const img of images) {
+      // Case 1: New base64 image - upload to Cloudinary
+      if (img.startsWith('data:image/')) {
+        const mimeType = img.split(';')[0].split(':')[1];
+        if (!allowedTypes.includes(mimeType)) {
+          return res.status(400).json({ message: 'Invalid image format' });
+        }
+
+        const base64Data = img.split(';base64,').pop() || '';
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        if (buffer.length > 5 * 1024 * 1024) {
+          return res.status(400).json({ message: 'Image size exceeds 5MB' });
+        }
+
+        const uploadResult = await cloudinary.uploader.upload(img, {
+          resource_type: 'image',
+          folder: 'instasip',
+        });
+
+        newImages.push(uploadResult.secure_url);
+        newPublicIds.push(uploadResult.public_id);
+      } 
+      // Case 2: Existing URL - keep it
+      else if (img.startsWith('http://') || img.startsWith('https://')) {
+        const index = existingProduct.images.indexOf(img);
+        
+        if (index !== -1) {
+          // This is an existing image, keep it
+          newImages.push(img);
+          newPublicIds.push(existingProduct.imagesPublicIds[index]);
+          keptUrls.add(img);
+        }
+      }
+    }
+
+    // Delete only the images that are NOT being kept
+    for (let i = 0; i < existingProduct.images.length; i++) {
+      const existingUrl = existingProduct.images[i];
+      const existingPublicId = existingProduct.imagesPublicIds[i];
+      
+      // If this image is not in the kept URLs set, delete it
+      if (!keptUrls.has(existingUrl) && existingPublicId) {
+        try {
+          await cloudinary.uploader.destroy(existingPublicId);
+          console.log('Image deleted from Cloudinary:', existingPublicId);
+        } catch (deleteError) {
+          console.error('Error deleting image from Cloudinary:', deleteError);
+        }
+      }
+    }
+
+    // Update the images arrays
+    updateData.images = newImages;
+    updateData.imagesPublicIds = newPublicIds;
+
+    // Set the primary image (first image in the array)
+    if (newImages.length > 0) {
+      updateData.image = newImages[0];
+      updateData.imagePublicId = newPublicIds[0];
+    } else {
+      updateData.image = DEFAULT_PRODUCT_IMAGE;
+      updateData.imagePublicId = '';
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Clear product cache after update
+    await clearProductCache();
+
+    return res.status(200).json({
+      message: "Product updated successfully",
+      product: updatedProduct
+    });
+  } catch (error) {
+    console.error("Error in updateProduct controller", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 export const deleteProduct = async (req: Request, res: Response) => {
     const productId = req.params.id;

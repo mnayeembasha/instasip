@@ -26,7 +26,7 @@ const ProductDetails = () => {
   const [isBuying, setIsBuying] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const autoplay = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));
+  const autoplay = useRef(Autoplay({ delay: 4000, stopOnInteraction: false }));
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'center' },
     [autoplay.current]
