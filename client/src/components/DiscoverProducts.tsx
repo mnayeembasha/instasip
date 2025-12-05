@@ -10,7 +10,7 @@ const preMixProducts = [
 const greenTeaProducts = [
   { name: 'Pomegranate Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536304/instasip/fjdz2k2irdp2jgvw4uco.jpg',link:"/products/pomegranate-flavoured-green-tea" },
   { name: 'Mint Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536282/instasip/tmt6iezplgclvbxi8ot0.png',link:"/products/mint-flavoured-green-tea" },
-  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1760536260/instasip/hi0hbv8o0dx9azlvwebh.png',link:"/products/ginger-lemon-flavoured-green-tea" }
+  { name: 'Ginger Lemon Flavoured Green Tea', price: '₹220', image: 'https://res.cloudinary.com/drzq4285d/image/upload/v1762791494/instasip/nl2shmfdsefh3jogjzwq.png',link:"/products/ginger-lemon-flavoured-green-tea" }
 ];
 
 // Combine products for "All"
