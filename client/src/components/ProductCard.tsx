@@ -21,9 +21,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { user: currentUser } = useAppSelector((state) => state.auth);
 
   const isComboPack = product.slug === 'premix-combo-pack' || product.slug === 'green-tea-combo-pack';
-  const packSize = isComboPack ? 30 : 10;
-  const price = isComboPack ? 630 : 220;
-  const originalPrice = isComboPack ? 750 : 250;
+  const packSize = isComboPack ? 30 : product.noOfItemsInPack ?? 10;
+  const price = isComboPack ? 630 : product.price;
+  const originalPrice = isComboPack ? 750 : product.price + 30;
   const discountPercentage = Math.round(((originalPrice - price) / originalPrice) * 100);
 
   const handleAddToCart = async () => {
@@ -84,7 +84,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </Link>
         <p className="text-xs text-gray-400 uppercase">{product.category}</p>
         <p className="text-sm text-[#4D301A]">
-          Pack of {packSize} cups {isComboPack ? '(10 each flavor)' : ''}
+          Pack of {packSize} Items {isComboPack ? '(10 each flavor)' : ''}
         </p>
         <div className="flex items-baseline gap-2">
           <p className="text-xl font-bold text-[#A86934]">&#8377;{price.toFixed(2)}</p>

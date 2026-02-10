@@ -37,9 +37,9 @@ const ProductDetails = () => {
     : [currentProduct?.image || '/placeholder-product.jpg'];
 
   const isComboPack = slug === 'premix-combo-pack' || slug === 'green-tea-combo-pack';
-  const packSize = 10;
+  const packSize = isComboPack ? 30 : currentProduct?.noOfItemsInPack ?? 10;
   const price = currentProduct?.price || (isComboPack ? 630 : 220);
-  const originalPrice = isComboPack ? 750 : 250;
+  const originalPrice = isComboPack ? 750 : (currentProduct?.price ? currentProduct?.price + 30 : 250);
   const discountPercentage = Math.round(((originalPrice - price) / originalPrice) * 100);
 
   // Fetch product
@@ -255,7 +255,7 @@ const ProductDetails = () => {
                 <h1 className="text-4xl font-bold text-[#4D301A] mb-2">{currentProduct.name}</h1>
                 <p className="text-sm text-[#6D6154] uppercase tracking-wide">{currentProduct.category}</p>
                 <p className="text-sm text-[#4D301A] mt-1">
-                  Pack of {packSize} cups {isComboPack ? '(10 each flavor)' : ''}
+                  Pack of {packSize} Items {isComboPack ? '(10 each flavor)' : ''}
                 </p>
               </div>
 

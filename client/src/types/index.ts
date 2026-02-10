@@ -19,6 +19,7 @@ export interface ProductType {
   createdAt: string;
   updatedAt: string;
   images: string[];
+  noOfItemsInPack?:number;
 }
 export interface CartItemType {
   product: ProductType;
