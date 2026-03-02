@@ -41,19 +41,55 @@ const ProductForm = ({ onSubmit, defaultValues, isLoading }: Props) => {
   );
   const [previews, setPreviews] = useState<string[]>([]);
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = Math.round((height *= MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = Math.round((width *= MAX_HEIGHT / height));
+              height = MAX_HEIGHT;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/webp', 0.8));
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   useEffect(() => {
     const genPreviews = async () => {
       const prevs = await Promise.all(
         imageFiles.map(async (f) => {
           if (typeof f === 'string') return f;
-          const reader = new FileReader();
-          return new Promise<string>((resolve) => {
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(f);
-          });
+          return URL.createObjectURL(f);
         })
       );
       setPreviews(prevs);
+      
+      // Cleanup URLs to avoid memory leaks
+      return () => prevs.forEach(url => {
+        if (url.startsWith('blob:')) URL.revokeObjectURL(url);
+      });
     };
     genPreviews();
   }, [imageFiles]);
@@ -61,10 +97,9 @@ const ProductForm = ({ onSubmit, defaultValues, isLoading }: Props) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      const currentNewSize = imageFiles.reduce((acc, f) => (typeof f === 'string' ? acc : acc + f.size), 0);
       const addedSize = newFiles.reduce((acc, file) => acc + file.size, 0);
-      if (currentNewSize + addedSize > 20 * 1024 * 1024) {
-        toast.error('Total new images size exceeds 20MB');
+      if (addedSize > 50 * 1024 * 1024) { // Allow larger files as they will be compressed
+        toast.error('Selected files are too large. Please select files under 50MB.');
         return;
       }
       setImageFiles((prev) => [...prev, ...newFiles]);
@@ -91,11 +126,7 @@ const ProductForm = ({ onSubmit, defaultValues, isLoading }: Props) => {
     const imagesData = await Promise.all(
       imageFiles.map(async (f) => {
         if (typeof f === 'string') return f;
-        const reader = new FileReader();
-        return new Promise<string>((resolve) => {
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.readAsDataURL(f);
-        });
+        return await compressImage(f);
       })
     );
     onSubmit({ ...values, images: imagesData });
