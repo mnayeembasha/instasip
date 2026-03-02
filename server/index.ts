@@ -21,7 +21,7 @@ app.use(
 );
 
 const allowedOrigins = NODE_ENV === "development"
-  ? ["http://localhost:5173"]
+  ? ["http://localhost:5173", "http://localhost:5174"]
   : ["https://instasip.in", "https://www.instasip.in"];
 
 // Custom CORS middleware to handle multiple origins and credentials
