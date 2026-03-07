@@ -37,9 +37,12 @@ export const generateInvoicePDF = (order: OrderType) => {
     doc.text('Opp Emerald School, Bangalore, 560068', 120, 25);
     doc.text('Phone: +91 8074581961', 120, 35);
     doc.text('Email: instasipfoodbeverages@gmail.com', 120, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.text('GST No: 29HJUPK5683R1ZL', 120, 45);
+    doc.setFont('helvetica', 'normal');
 
     doc.setLineWidth(0.5);
-    doc.line(10, 50, 200, 50);
+    doc.line(10, 52, 200, 52);
 
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');

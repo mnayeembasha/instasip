@@ -44,6 +44,7 @@ const InvoiceModal = ({ open, onOpenChange, order }: InvoiceModalProps) => {
                 <p className="text-sm text-gray-600">Opp Emerald School, Bangalore, 560068</p>
                 <p className="text-sm text-gray-600">Phone: +91 8074581961</p>
                 <p className="text-sm text-gray-600">Email: instasipfoodbeverages@gmail.com</p>
+                <p className="text-sm text-gray-600 font-semibold mt-1">GST Number: 29HJUPK5683R1ZL</p>
               </div>
             </div>
             <div className="mt-4 text-right">
