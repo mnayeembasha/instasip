@@ -8,6 +8,7 @@ import WhyChooseUs from '@/components/WhyChooseUs';
 // import HowToUsePreMix from '@/components/HowToUsePreMix';
 // import HowToUseGreenTea from '@/components/HowToUseGreenTea';
 import Benefits from '@/components/Benefits';
+import Faqs from '@/components/Faqs';
 import InstasipBenefitsHomepage from "@/components/InstasipBenefitsHomepage";
 import SustainablePackaging from '@/components/SustainablePackaging';
 import Footer from '@/components/Footer';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
         {/* <HowToUsePreMix /> */}
         {/* <HowToUseGreenTea /> */}
         <Benefits />
+        <Faqs />
         <SustainablePackaging />
       </main>
       <Footer />
